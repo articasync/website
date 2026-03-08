@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 
+export const maxDuration = 300; // Allow Vercel to run up to 5 minutes (300 seconds) if they have the plan that supports it
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   // 1. AUTHENTICATE THE CRON JOB
   const authHeader = request.headers.get("Authorization");
