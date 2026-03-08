@@ -44,6 +44,9 @@ export async function POST(request: Request) {
     );
 
     if (!resyResponse.ok) {
+      if (resyResponse.status === 404) {
+        throw new Error(`Resy could not find a restaurant with the slug "${slug}". Please check the spelling.`);
+      }
       throw new Error(`Resy API returned status ${resyResponse.status}. Make sure your RESY_API_KEY is correct.`);
     }
 
