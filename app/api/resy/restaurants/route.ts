@@ -57,7 +57,12 @@ export async function POST(request: Request) {
     }
 
     const HEADERS = {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       Authorization: `ResyAPI api_key="${process.env.RESY_API_KEY}"`,
+      Accept: "application/json, text/plain, */*",
+      Origin: "https://resy.com",
+      "X-Origin": "https://resy.com",
+      "Content-Type": "application/json",
     };
 
     const resyResponse = await fetch(
