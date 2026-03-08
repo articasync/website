@@ -174,6 +174,8 @@ export async function GET(request: Request) {
 
       try {
         await resend.emails.send({
+          // Resend requires the 'from' field to be a defined string.
+          // Since you don't have a domain yet, we will fallback to the testing domain.
           from: process.env.RESEND_FROM_EMAIL || "Resy Alert <onboarding@resend.dev>",
           to: [email],
           subject: subject,
