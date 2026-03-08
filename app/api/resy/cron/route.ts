@@ -113,6 +113,7 @@ export async function GET(request: Request) {
               const formattedDate = slotDt.toISOString().split("T")[0];
 
               foundSlots.push({
+                restaurant_id: restaurant.id,
                 restaurant_name: restaurant.name,
                 restaurant_slug: restaurant.slug,
                 day: formattedDate,
@@ -167,8 +168,22 @@ export async function GET(request: Request) {
             subject: subject,
             text: content,
           });
+
+          await prisma.alert.update({
+            where: { restaurantId_email: { restaurantId: slot.restaurant_id, email: email } },
+            data: { lastEmailSentAt: new Date(), lastEmailStatus: "success" },
+          });
         } catch (e) {
           console.error("Failed to send email to", email, e);
+
+          try {
+            await prisma.alert.update({
+              where: { restaurantId_email: { restaurantId: slot.restaurant_id, email: email } },
+              data: { lastEmailSentAt: new Date(), lastEmailStatus: "failed" },
+            });
+          } catch (updateErr) {
+            console.error("Failed to update alert status", updateErr);
+          }
         }
       }
     }

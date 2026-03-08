@@ -30,8 +30,10 @@ model Alert {
   id           String     @id @default(cuid())
   restaurantId Int
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  email        String
-  createdAt    DateTime   @default(now())
+  email           String
+  createdAt       DateTime   @default(now())
+  lastEmailSentAt DateTime?
+  lastEmailStatus String? // "success" or "failed"
 
   @@unique([restaurantId, email])
 }

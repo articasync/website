@@ -37,7 +37,8 @@ export async function GET() {
           email: a.email,
           lastCheckedAt: a.restaurant.lastCheckedAt,
           lastCheckStatus: a.restaurant.lastCheckStatus,
-          lastNotifiedAt: lastSlot?.createdAt,
+          lastNotifiedAt: a.lastEmailSentAt || lastSlot?.createdAt,
+          lastEmailStatus: a.lastEmailStatus || (lastSlot ? "success" : undefined),
           lastNotifiedSlotDate: lastSlot?.slotDateTime,
         };
       })
