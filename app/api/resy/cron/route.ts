@@ -58,8 +58,6 @@ export async function GET(request: Request) {
 
     console.log(`Starting 30-day availability check for: ${restaurant.name}`);
     let totalSlotsFoundForRestaurant = 0;
-    let targetTimeSlotsFound = 0;
-    let newTargetTimeSlotsFound = 0;
     let checkStatus = "200 OK";
 
     for (let i = 0; i < 30; i++) {
@@ -68,7 +66,7 @@ export async function GET(request: Request) {
       const dateStr = checkDate.toISOString().split("T")[0];
 
       try {
-        const findUrl = `https://api.resy.com/4/find?lat=0&long=0&day=${dateStr}&party_size=4&venue_id=${restaurant.id}`;
+        const findUrl = `https://api.resy.com/4/find?lat=0&long=0&day=${dateStr}&party_size=2&venue_id=${restaurant.id}`;
         const findResponse = await fetch(findUrl, { headers: HEADERS as any });
 
         if (!findResponse.ok) {
@@ -87,26 +85,24 @@ export async function GET(request: Request) {
           if (!slotTimeStr) continue;
 
           // Convert to Date treating it as UTC for simplicity or parsing exact strings
-          // Resy usually returns formats like "2024-05-15 18:00:00"
+          // Resy time is local time, e.g. "2024-05-15 18:00:00"
+          // We append Z and use getUTCHours() to accurately extract the literal hour without Vercel's timezone shifting it
           const slotDt = new Date(slotTimeStr.replace(" ", "T") + "Z");
-          const localHour = slotDt.getUTCHours(); // Get hours extracting straight from the string's intended hour
+          const localHour = slotDt.getUTCHours();
 
           // Only notify for slots between 5 PM and 10 PM
           if (localHour >= 17 && localHour < 22) {
-            targetTimeSlotsFound++;
-
             const existing = await prisma.notifiedSlot.findUnique({
               where: {
                 restaurantId_slotDateTime_partySize: {
                   restaurantId: restaurant.id,
                   slotDateTime: slotDt,
-                  partySize: 4,
+                  partySize: 2,
                 },
               },
             });
 
             if (!existing) {
-              newTargetTimeSlotsFound++;
               // New slot found! Add to list and mark as notified.
               const formattedTime = slotDt.toLocaleTimeString("en-US", {
                 hour: "numeric",
@@ -120,7 +116,7 @@ export async function GET(request: Request) {
                 restaurant_slug: restaurant.slug,
                 day: formattedDate,
                 time: formattedTime,
-                party_size: 4,
+                party_size: 2,
                 emails: emails,
               });
 
@@ -128,7 +124,7 @@ export async function GET(request: Request) {
                 data: {
                   restaurantId: restaurant.id,
                   slotDateTime: slotDt,
-                  partySize: 4,
+                  partySize: 2,
                 },
               });
             }
@@ -140,7 +136,7 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log(`Finished checking ${restaurant.name}. Total raw slots: ${totalSlotsFoundForRestaurant}. Between 5PM-10PM: ${targetTimeSlotsFound}. New/Un-notified: ${newTargetTimeSlotsFound}.`);
+    console.log(`Finished checking ${restaurant.name}. Resy returned ${totalSlotsFoundForRestaurant} total slots across 30 days.`);
 
     // Update the restaurant's last check status
     try {
@@ -156,21 +152,34 @@ export async function GET(request: Request) {
     }
   }
 
-  // 5. SEND NOTIFICATIONS
+  // 5. SEND NOTIFICATIONS (Grouped to at most 1 email per user)
   if (foundSlots.length > 0) {
+    const emailsToSend: { [email: string]: any[] } = {};
     for (const slot of foundSlots) {
-      const subject = `Resy Alert: ${slot.restaurant_name} at ${slot.time}`;
-      const content = `A table for ${slot.party_size} is available at ${slot.restaurant_name} on ${slot.day} at ${slot.time}.\n\nBook here: https://resy.com/cities/ny/${slot.restaurant_slug}?date=${slot.day}&seats=${slot.party_size}`;
+      for (const email of slot.emails) {
+        if (!emailsToSend[email]) emailsToSend[email] = [];
+        emailsToSend[email].push(slot);
+      }
+    }
+
+    for (const [email, slots] of Object.entries(emailsToSend)) {
+      const subject = `Resy Alert: ${slots.length} table(s) found!`;
+      let content = `We found ${slots.length} table(s) matching your alerts:\n\n`;
+
+      for (const slot of slots) {
+        content += `- ${slot.restaurant_name} on ${slot.day} at ${slot.time} (Party of ${slot.party_size})\n`;
+        content += `  Book here: https://resy.com/cities/ny/${slot.restaurant_slug}?date=${slot.day}&seats=${slot.party_size}\n\n`;
+      }
 
       try {
         await resend.emails.send({
           from: "Resy Alert <onboarding@resend.dev>",
-          to: slot.emails,
+          to: [email],
           subject: subject,
           text: content,
         });
       } catch (e) {
-        console.error("Failed to send email to", slot.emails, e);
+        console.error("Failed to send email to", email, e);
       }
     }
   }
