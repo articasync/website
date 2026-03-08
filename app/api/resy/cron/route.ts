@@ -58,6 +58,8 @@ export async function GET(request: Request) {
 
     console.log(`Starting 30-day availability check for: ${restaurant.name}`);
     let totalSlotsFoundForRestaurant = 0;
+    let targetTimeSlotsFound = 0;
+    let newTargetTimeSlotsFound = 0;
     let checkStatus = "200 OK";
 
     for (let i = 0; i < 30; i++) {
@@ -85,11 +87,14 @@ export async function GET(request: Request) {
           if (!slotTimeStr) continue;
 
           // Convert to Date treating it as UTC for simplicity or parsing exact strings
-          const slotDt = new Date(slotTimeStr.replace("Z", "+00:00"));
-          const localHour = slotDt.getHours();
+          // Resy usually returns formats like "2024-05-15 18:00:00"
+          const slotDt = new Date(slotTimeStr.replace(" ", "T") + "Z");
+          const localHour = slotDt.getUTCHours(); // Get hours extracting straight from the string's intended hour
 
           // Only notify for slots between 5 PM and 10 PM
           if (localHour >= 17 && localHour < 22) {
+            targetTimeSlotsFound++;
+
             const existing = await prisma.notifiedSlot.findUnique({
               where: {
                 restaurantId_slotDateTime_partySize: {
@@ -101,10 +106,12 @@ export async function GET(request: Request) {
             });
 
             if (!existing) {
+              newTargetTimeSlotsFound++;
               // New slot found! Add to list and mark as notified.
               const formattedTime = slotDt.toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "2-digit",
+                timeZone: 'UTC'
               });
               const formattedDate = slotDt.toISOString().split("T")[0];
 
@@ -133,7 +140,7 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log(`Finished checking ${restaurant.name}. Resy returned ${totalSlotsFoundForRestaurant} total slots across 30 days.`);
+    console.log(`Finished checking ${restaurant.name}. Total raw slots: ${totalSlotsFoundForRestaurant}. Between 5PM-10PM: ${targetTimeSlotsFound}. New/Un-notified: ${newTargetTimeSlotsFound}.`);
 
     // Update the restaurant's last check status
     try {
