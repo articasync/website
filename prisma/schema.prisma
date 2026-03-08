@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url       = env("DATABASE_URL") // Connection string (used for the app, usually pooled)
+  directUrl = env("DIRECT_URL") // Direct connection for migrations (e.g., Prisma db push)
 }
 
 // Global settings for the application
