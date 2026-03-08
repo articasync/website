@@ -78,7 +78,6 @@ export async function GET(request: Request) {
         const data = await findResponse.json();
         const venues = data.results?.venues;
         const slots = venues?.[0]?.slots || [];
-        totalSlotsFoundForRestaurant += slots.length;
 
         for (const slot of slots) {
           const slotTimeStr = slot.date?.start;
@@ -92,6 +91,8 @@ export async function GET(request: Request) {
 
           // Only notify for slots between 5 PM and 10 PM
           if (localHour >= 17 && localHour < 22) {
+            totalSlotsFoundForRestaurant++;
+
             const existing = await prisma.notifiedSlot.findUnique({
               where: {
                 restaurantId_slotDateTime_partySize: {
