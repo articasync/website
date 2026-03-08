@@ -68,7 +68,21 @@ export default function RestaurantList() {
                 body: JSON.stringify({ slug, email }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to add alert');
+            if (!res.ok) {
+                if (data.resyUrl) {
+                    toast.error(
+                        <span>
+                            {data.error} <br />
+                            <a href={data.resyUrl} target="_blank" rel="noopener noreferrer" className="underline text-blue-600 font-medium hover:text-blue-800">
+                                Book directly here
+                            </a>
+                        </span>,
+                        { id: toastId, duration: 8000 }
+                    );
+                    return;
+                }
+                throw new Error(data.error || 'Failed to add alert');
+            }
             
             toast.success(`Added ${data.name} for ${email}!`, { id: toastId });
             setAlerts(prev => [data, ...prev]);

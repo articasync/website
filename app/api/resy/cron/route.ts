@@ -153,34 +153,23 @@ export async function GET(request: Request) {
     }
   }
 
-  // 5. SEND NOTIFICATIONS (Grouped to at most 1 email per user)
+  // 5. SEND NOTIFICATIONS
   if (foundSlots.length > 0) {
-    const emailsToSend: { [email: string]: any[] } = {};
     for (const slot of foundSlots) {
       for (const email of slot.emails) {
-        if (!emailsToSend[email]) emailsToSend[email] = [];
-        emailsToSend[email].push(slot);
-      }
-    }
+        const subject = `Resy Alert: Table found at ${slot.restaurant_name}!`;
+        const content = `We found a table matching your alert:\n\n- ${slot.restaurant_name} on ${slot.day} at ${slot.time} (Party of ${slot.party_size})\n  Book here: https://resy.com/cities/ny/${slot.restaurant_slug}?date=${slot.day}&seats=${slot.party_size}\n\n`;
 
-    for (const [email, slots] of Object.entries(emailsToSend)) {
-      const subject = `Resy Alert: ${slots.length} table(s) found!`;
-      let content = `We found ${slots.length} table(s) matching your alerts:\n\n`;
-
-      for (const slot of slots) {
-        content += `- ${slot.restaurant_name} on ${slot.day} at ${slot.time} (Party of ${slot.party_size})\n`;
-        content += `  Book here: https://resy.com/cities/ny/${slot.restaurant_slug}?date=${slot.day}&seats=${slot.party_size}\n\n`;
-      }
-
-      try {
-        await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL as string,
-          to: [email],
-          subject: subject,
-          text: content,
-        });
-      } catch (e) {
-        console.error("Failed to send email to", email, e);
+        try {
+          await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL as string,
+            to: [email],
+            subject: subject,
+            text: content,
+          });
+        } catch (e) {
+          console.error("Failed to send email to", email, e);
+        }
       }
     }
   }

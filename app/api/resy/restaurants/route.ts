@@ -80,6 +80,45 @@ export async function POST(request: Request) {
       throw new Error("Invalid Resy slug or missing data in API response");
     }
 
+    // Check availability over the next 7 days between 5 PM and 9 PM
+    const today = new Date();
+    let totalSlotsFound = 0;
+    const fetchPromises = [];
+
+    for (let i = 0; i < 7; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() + i);
+      const dateStr = checkDate.toISOString().split("T")[0];
+      const findUrl = `https://api.resy.com/4/find?lat=0&long=0&day=${dateStr}&party_size=2&venue_id=${resyId}`;
+      fetchPromises.push(fetch(findUrl, { headers: HEADERS as any }).then(res => res.json()).catch(() => null));
+    }
+
+    const results = await Promise.all(fetchPromises);
+    for (const data of results) {
+      if (!data) continue;
+      const slots = data.results?.venues?.[0]?.slots || [];
+      for (const slot of slots) {
+        const slotTimeStr = slot.date?.start;
+        if (!slotTimeStr) continue;
+        const slotDt = new Date(slotTimeStr.replace(" ", "T") + "Z");
+        const localHour = slotDt.getUTCHours();
+        // Only count prime time slots
+        if (localHour >= 17 && localHour < 21) {
+          totalSlotsFound++;
+        }
+      }
+    }
+
+    if (totalSlotsFound > 2) {
+      return NextResponse.json(
+        {
+          error: `We found ${totalSlotsFound} open prime-time tables for ${name} over the next 7 days. This restaurant is currently too easy to book to warrant an alert!`,
+          resyUrl: `https://resy.com/cities/ny/${slug}`
+        },
+        { status: 400 }
+      );
+    }
+
     // Upsert the restaurant to ensure it exists
     const restaurant = await prisma.restaurant.upsert({
       where: { id: resyId },
