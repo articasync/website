@@ -25,29 +25,34 @@ export async function GET(request: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   // 3. GET DATA FROM DATABASE
-  const notificationEmailSetting = await prisma.setting.findUnique({
-    where: { key: "notification_email" },
+  const alerts = await prisma.alert.findMany({
+    include: { restaurant: true },
   });
 
-  if (!notificationEmailSetting || !notificationEmailSetting.value) {
-    return NextResponse.json(
-      { error: "Notification email not set" },
-      { status: 400 }
-    );
+  if (!alerts.length) {
+    return NextResponse.json({ message: "No alerts configured." });
   }
 
-  const notificationEmail = notificationEmailSetting.value;
-  const restaurantsToScrape = await prisma.restaurant.findMany();
-
-  if (!restaurantsToScrape.length) {
-    return NextResponse.json({ message: "No restaurants to scrape." });
+  // Create a map of restaurants we need to scrape, and who to email for each
+  const jobs: { [restaurantId: number]: { restaurant: any; emails: string[] } } = {};
+  for (const alert of alerts) {
+    if (!jobs[alert.restaurantId]) {
+      jobs[alert.restaurantId] = {
+        restaurant: alert.restaurant,
+        emails: [],
+      };
+    }
+    jobs[alert.restaurantId].emails.push(alert.email);
   }
 
   // 4. RUN THE SCRAPER LOGIC
   const foundSlots: any[] = [];
   const today = new Date();
 
-  for (const restaurant of restaurantsToScrape) {
+  for (const [idStr, jobData] of Object.entries(jobs)) {
+    const restaurant = jobData.restaurant;
+    const emails = jobData.emails;
+
     for (let i = 0; i < 30; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() + i);
@@ -100,6 +105,7 @@ export async function GET(request: Request) {
                 day: formattedDate,
                 time: formattedTime,
                 party_size: 4,
+                emails: emails,
               });
 
               await prisma.notifiedSlot.create({
@@ -127,12 +133,12 @@ export async function GET(request: Request) {
       try {
         await resend.emails.send({
           from: "Resy Alert <onboarding@resend.dev>",
-          to: [notificationEmail],
+          to: slot.emails,
           subject: subject,
           text: content,
         });
       } catch (e) {
-        console.error("Failed to send email", e);
+        console.error("Failed to send email to", slot.emails, e);
       }
     }
   }

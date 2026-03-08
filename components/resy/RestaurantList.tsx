@@ -3,56 +3,59 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-interface Restaurant {
-    id: number;
+interface Alert {
+    id: string;
     slug: string;
     name: string;
+    email: string;
 }
 
 export default function RestaurantList() {
-    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [alerts, setAlerts] = useState<Alert[]>([]);
     const [slug, setSlug] = useState('');
+    const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchRestaurants = async () => {
+    const fetchAlerts = async () => {
         try {
             const res = await fetch('/api/resy/restaurants');
             if (!res.ok) throw new Error('Failed to fetch');
             const data = await res.json();
-            setRestaurants(data);
+            setAlerts(data);
         } catch (error) {
-            toast.error('Could not fetch restaurants.');
+            toast.error('Could not fetch alerts.');
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchRestaurants();
+        fetchAlerts();
     }, []);
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!slug) return;
-        const toastId = toast.loading(`Adding ${slug}...`);
+        if (!slug || !email) return;
+        const toastId = toast.loading(`Adding alert for ${slug}...`);
         try {
             const res = await fetch('/api/resy/restaurants', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slug }),
+                body: JSON.stringify({ slug, email }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to add restaurant');
+            if (!res.ok) throw new Error(data.error || 'Failed to add alert');
             
-            toast.success(`Added ${data.name}!`, { id: toastId });
-            setRestaurants(prev => [...prev, data]);
+            toast.success(`Added ${data.name} for ${email}!`, { id: toastId });
+            setAlerts(prev => [data, ...prev]);
             setSlug('');
+            setEmail('');
         } catch (error: any) {
             toast.error(error.message, { id: toastId });
         }
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         const toastId = toast.loading('Deleting...');
         try {
             const res = await fetch(`/api/resy/restaurants?id=${id}`, {
@@ -60,40 +63,48 @@ export default function RestaurantList() {
             });
             if (!res.ok) throw new Error('Failed to delete');
             toast.success('Deleted!', { id: toastId });
-            setRestaurants(prev => prev.filter(r => r.id !== id));
+            setAlerts(prev => prev.filter(a => a.id !== id));
         } catch (error) {
-            toast.error('Could not delete restaurant.', { id: toastId });
+            toast.error('Could not delete alert.', { id: toastId });
         }
     };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-semibold mb-4">Monitored Restaurants</h2>
-            <form onSubmit={handleAdd} className="flex gap-2 mb-6">
+            <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-2 mb-6">
                 <input
                     type="text"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
-                    placeholder="Enter restaurant slug (e.g., 'theodora')"
+                    placeholder="Resy Slug (e.g., 'theodora')"
                     className="flex-grow p-2 border rounded-md"
                 />
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email Address"
+                    className="flex-grow p-2 border rounded-md"
+                />
+                <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600">
                     Add
                 </button>
             </form>
             {isLoading ? <p>Loading...</p> : (
-                <ul className="space-y-2">
-                    {restaurants.map(r => (
-                        <li key={r.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                <ul className="space-y-3">
+                    {alerts.map(a => (
+                        <li key={a.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md border text-sm sm:text-base">
                             <div>
-                                <p className="font-semibold">{r.name}</p>
-                                <p className="text-sm text-gray-500">{r.slug}</p>
+                                <p className="font-semibold text-gray-900">{a.name} <span className="font-normal text-gray-500 text-xs ml-1">({a.slug})</span></p>
+                                <p className="text-sm text-blue-600 mt-0.5">{a.email}</p>
                             </div>
-                            <button onClick={() => handleDelete(r.id)} className="text-red-500 hover:text-red-700">
+                            <button onClick={() => handleDelete(a.id)} className="text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors">
                                 Delete
                             </button>
                         </li>
                     ))}
+                    {alerts.length === 0 && <p className="text-gray-500 text-sm italic">No alerts configured yet.</p>}
                 </ul>
             )}
         </div>

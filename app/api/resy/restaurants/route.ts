@@ -3,9 +3,18 @@ import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const restaurants = await prisma.restaurant.findMany();
+    const alerts = await prisma.alert.findMany({
+      include: { restaurant: true },
+      orderBy: { createdAt: "desc" },
+    });
+
     return NextResponse.json(
-      restaurants.map((r) => ({ id: r.id, slug: r.slug, name: r.name }))
+      alerts.map((a) => ({
+        id: a.id,
+        slug: a.restaurant.slug,
+        name: a.restaurant.name,
+        email: a.email,
+      }))
     );
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -15,10 +24,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { slug } = body;
+    const { slug, email } = body;
 
-    if (!slug) {
-      return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+    if (!slug || !email) {
+      return NextResponse.json({ error: "Slug and Email are required" }, { status: 400 });
     }
 
     const HEADERS = {
@@ -42,17 +51,38 @@ export async function POST(request: Request) {
       throw new Error("Invalid Resy slug or missing data in API response");
     }
 
-    const newRestaurant = await prisma.restaurant.create({
-      data: { id: resyId, slug, name },
+    // Upsert the restaurant to ensure it exists
+    const restaurant = await prisma.restaurant.upsert({
+      where: { id: resyId },
+      create: { id: resyId, slug, name },
+      update: { slug, name }, // ensure latest slug/name is saved
+    });
+
+    // Create the alert mapping for this email
+    const newAlert = await prisma.alert.create({
+      data: {
+        restaurantId: restaurant.id,
+        email,
+      },
+      include: { restaurant: true },
     });
 
     return NextResponse.json(
-      { id: newRestaurant.id, slug: newRestaurant.slug, name: newRestaurant.name },
+      {
+        id: newAlert.id,
+        slug: newAlert.restaurant.slug,
+        name: newAlert.restaurant.name,
+        email: newAlert.email,
+      },
       { status: 201 }
     );
   } catch (e: any) {
+    // Check for unique constraint violation (P2002) in Prisma
+    if (e.code === 'P2002') {
+      return NextResponse.json({ error: "This email is already monitoring this restaurant." }, { status: 400 });
+    }
     return NextResponse.json(
-      { error: `Invalid slug or failed to add: ${e.message}` },
+      { error: `Failed to add: ${e.message}` },
       { status: 400 }
     );
   }
@@ -61,17 +91,17 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const id = searchParams.get("id"); // This is the ID of the Alert, not Restaurant.
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    await prisma.restaurant.delete({
-      where: { id: parseInt(id) },
+    await prisma.alert.delete({
+      where: { id: id },
     });
 
-    return NextResponse.json({ message: "Restaurant deleted" });
+    return NextResponse.json({ message: "Alert deleted" });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

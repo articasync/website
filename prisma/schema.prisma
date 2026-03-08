@@ -20,7 +20,18 @@ model Restaurant {
   id      Int    @id // This will be the Resy Venue ID
   slug    String @unique
   name    String
-  // Optional: add a relation to a user model in the future
+  alerts  Alert[]
+}
+
+// Specific email alerts for a restaurant
+model Alert {
+  id           String     @id @default(cuid())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  email        String
+  createdAt    DateTime   @default(now())
+
+  @@unique([restaurantId, email])
 }
 
 // To track which notifications have already been sent to avoid spam
