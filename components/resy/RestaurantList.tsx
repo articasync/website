@@ -116,20 +116,22 @@ export default function RestaurantList() {
             {isLoading ? <p>Loading...</p> : (
                 <ul className="space-y-3">
                     {alerts.map(a => (
-                        <li key={a.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md border text-sm sm:text-base">
-                            <div>
-                                <p className="font-semibold text-gray-900">{a.name} <span className="font-normal text-gray-500 text-xs ml-1">({a.slug})</span></p>
-                                <p className="text-sm text-blue-600 mt-0.5">{a.email}</p>
+                        <li key={a.id} className="flex justify-between items-start p-3 bg-gray-50 rounded-md border text-sm sm:text-base">
+                            <div className="flex flex-col gap-0.5">
                                 {a.lastCheckedAt && (
-                                    <div className="flex items-center gap-1.5 mt-1.5">
-                                        <div className={`w-2 h-2 rounded-full ${a.lastCheckStatus?.startsWith('200') ? 'bg-green-500' : 'bg-red-500'}`} />
-                                        <span className="text-xs text-gray-500">
-                                            {a.lastCheckStatus?.startsWith('200') ? 'OK' : a.lastCheckStatus} - {timeSince(a.lastCheckedAt)}
-                                        </span>
-                                    </div>
+                                    <>
+                                        <p className={`font-medium ${a.lastCheckStatus?.startsWith('200') ? 'text-green-600' : 'text-red-600'}`}>
+                                            {a.lastCheckStatus?.startsWith('200') ? '200' : a.lastCheckStatus}
+                                        </p>
+                                        <p className="text-xs text-gray-500 mb-1">
+                                            {timeSince(a.lastCheckedAt)}
+                                        </p>
+                                    </>
                                 )}
+                                <p className="font-semibold text-gray-900">{a.name} <span className="font-normal text-gray-500 text-xs ml-1">({a.slug})</span></p>
+                                <p className="text-sm text-blue-600">{a.email}</p>
                             </div>
-                            <button onClick={() => handleDelete(a.id)} className="text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors">
+                            <button onClick={() => handleDelete(a.id)} className="text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors self-end">
                                 Delete
                             </button>
                         </li>
