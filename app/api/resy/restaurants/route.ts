@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const HEADERS = {
-      Authorization: `ResyAPI api_key="${process.env.RESY_API_KEY}"`,
+      Authorization: `ResyAPI api_key="${process.env.RESY_API_KEY || "VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"}"`,
     };
 
     const resyResponse = await fetch(
