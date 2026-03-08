@@ -56,11 +56,11 @@ export async function GET(request: Request) {
     const restaurant = jobData.restaurant;
     const emails = jobData.emails;
 
-    console.log(`Starting 30-day availability check for: ${restaurant.name}`);
+    console.log(`Starting availability check for: ${restaurant.name}`);
     let totalSlotsFoundForRestaurant = 0;
     let checkStatus = "200 OK";
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 7; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() + i);
       const dateStr = checkDate.toISOString().split("T")[0];
@@ -89,8 +89,8 @@ export async function GET(request: Request) {
           const slotDt = new Date(slotTimeStr.replace(" ", "T") + "Z");
           const localHour = slotDt.getUTCHours();
 
-          // Only notify for slots between 5 PM and 10 PM
-          if (localHour >= 17 && localHour < 22) {
+          // Only notify for slots between 5 PM and 9 PM
+          if (localHour >= 17 && localHour < 21) {
             totalSlotsFoundForRestaurant++;
 
             const existing = await prisma.notifiedSlot.findUnique({
