@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+// Global settings for the application
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique // e.g., "notification_email"
+  value String
+}
+
+// Restaurants to be monitored
+model Restaurant {
+  id      Int    @id // This will be the Resy Venue ID
+  slug    String @unique
+  name    String
+  // Optional: add a relation to a user model in the future
+}
+
+// To track which notifications have already been sent to avoid spam
+model NotifiedSlot {
+  id            String   @id @default(cuid())
+  restaurantId  Int
+  slotDateTime  DateTime // e.g., 2024-08-15T19:00:00Z
+  partySize     Int
+  createdAt     DateTime @default(now())
+
+  @@unique([restaurantId, slotDateTime, partySize])
+}
