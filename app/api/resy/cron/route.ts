@@ -174,7 +174,7 @@ export async function GET(request: Request) {
 
       try {
         await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL,
+          from: process.env.RESEND_FROM_EMAIL as string,
           to: [email],
           subject: subject,
           text: content,
