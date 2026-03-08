@@ -56,6 +56,9 @@ export async function GET(request: Request) {
     const restaurant = jobData.restaurant;
     const emails = jobData.emails;
 
+    console.log(`Starting 30-day availability check for: ${restaurant.name}`);
+    let totalSlotsFoundForRestaurant = 0;
+
     for (let i = 0; i < 30; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() + i);
@@ -73,6 +76,7 @@ export async function GET(request: Request) {
         const data = await findResponse.json();
         const venues = data.results?.venues;
         const slots = venues?.[0]?.slots || [];
+        totalSlotsFoundForRestaurant += slots.length;
 
         for (const slot of slots) {
           const slotTimeStr = slot.date?.start;
@@ -125,6 +129,8 @@ export async function GET(request: Request) {
         console.error(`Error scraping ${restaurant.name} on ${dateStr}:`, e);
       }
     }
+
+    console.log(`Finished checking ${restaurant.name}. Resy returned ${totalSlotsFoundForRestaurant} total slots across 30 days.`);
   }
 
   // 5. SEND NOTIFICATIONS
