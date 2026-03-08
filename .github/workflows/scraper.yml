@@ -1,0 +1,16 @@
+name: Resy Scraper
+
+on:
+  schedule:
+    - cron: '* * * * *' # Run every minute
+  workflow_dispatch: # Allow manually triggering from the Actions tab
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Cron Route
+        run: |
+          curl -f -X GET "${{ secrets.APP_URL }}/api/resy/cron" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json"
