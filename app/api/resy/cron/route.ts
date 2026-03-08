@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const HEADERS = {
     "User-Agent":
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    Authorization: `ResyAPI api_key="${process.env.RESY_API_KEY || "VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"}"`,
+    Authorization: `ResyAPI api_key="${process.env.RESY_API_KEY}"`,
     Accept: "application/json, text/plain, */*",
     Origin: "https://resy.com",
     "X-Origin": "https://resy.com",
