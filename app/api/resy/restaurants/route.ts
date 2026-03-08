@@ -10,15 +10,37 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
+    const restaurantIds = Array.from(new Set(alerts.map((a: any) => a.restaurantId)));
+    const latestSlotsData = await Promise.all(
+      restaurantIds.map(async (id) => {
+        return await prisma.notifiedSlot.findFirst({
+          where: { restaurantId: id },
+          orderBy: { createdAt: "desc" },
+        });
+      })
+    );
+
+    const lastNotifiedMap = new Map();
+    latestSlotsData.forEach((slot) => {
+      if (slot) {
+        lastNotifiedMap.set(slot.restaurantId, slot);
+      }
+    });
+
     return NextResponse.json(
-      alerts.map((a: any) => ({
-        id: a.id,
-        slug: a.restaurant.slug,
-        name: a.restaurant.name,
-        email: a.email,
-        lastCheckedAt: a.restaurant.lastCheckedAt,
-        lastCheckStatus: a.restaurant.lastCheckStatus,
-      }))
+      alerts.map((a: any) => {
+        const lastSlot = lastNotifiedMap.get(a.restaurantId);
+        return {
+          id: a.id,
+          slug: a.restaurant.slug,
+          name: a.restaurant.name,
+          email: a.email,
+          lastCheckedAt: a.restaurant.lastCheckedAt,
+          lastCheckStatus: a.restaurant.lastCheckStatus,
+          lastNotifiedAt: lastSlot?.createdAt,
+          lastNotifiedSlotDate: lastSlot?.slotDateTime,
+        };
+      })
     );
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
