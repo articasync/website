@@ -122,7 +122,7 @@ export default function RestaurantList() {
                                     <p className="font-bold text-gray-900 text-lg tracking-tight">{a.name} <span className="font-normal text-gray-400 text-sm ml-1">({a.slug})</span></p>
                                     {a.lastCheckStatus?.startsWith('200') ? (
                                         <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20">
-                                            Active (200)
+                                            OK (200)
                                         </span>
                                     ) : a.lastCheckStatus ? (
                                         <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/10">
