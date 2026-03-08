@@ -9,11 +9,13 @@ export async function GET() {
     });
 
     return NextResponse.json(
-      alerts.map((a) => ({
+      alerts.map((a: any) => ({
         id: a.id,
         slug: a.restaurant.slug,
         name: a.restaurant.name,
         email: a.email,
+        lastCheckedAt: a.restaurant.lastCheckedAt,
+        lastCheckStatus: a.restaurant.lastCheckStatus,
       }))
     );
   } catch (e: any) {

@@ -8,6 +8,28 @@ interface Alert {
     slug: string;
     name: string;
     email: string;
+    lastCheckedAt?: string;
+    lastCheckStatus?: string;
+}
+
+function timeSince(dateString: string) {
+    if (!dateString) return 'never';
+    const date = new Date(dateString);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval >= 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval >= 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval >= 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval >= 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval >= 1) return Math.floor(interval) + " minutes ago";
+
+    if (seconds < 10) return "just now";
+    return Math.floor(seconds) + " seconds ago";
 }
 
 export default function RestaurantList() {
@@ -98,6 +120,14 @@ export default function RestaurantList() {
                             <div>
                                 <p className="font-semibold text-gray-900">{a.name} <span className="font-normal text-gray-500 text-xs ml-1">({a.slug})</span></p>
                                 <p className="text-sm text-blue-600 mt-0.5">{a.email}</p>
+                                {a.lastCheckedAt && (
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <div className={`w-2 h-2 rounded-full ${a.lastCheckStatus?.startsWith('200') ? 'bg-green-500' : 'bg-red-500'}`} />
+                                        <span className="text-xs text-gray-500">
+                                            {a.lastCheckStatus?.startsWith('200') ? 'OK' : a.lastCheckStatus} - {timeSince(a.lastCheckedAt)}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                             <button onClick={() => handleDelete(a.id)} className="text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors">
                                 Delete

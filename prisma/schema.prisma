@@ -17,10 +17,12 @@ model Setting {
 
 // Restaurants to be monitored
 model Restaurant {
-  id      Int    @id // This will be the Resy Venue ID
-  slug    String @unique
-  name    String
-  alerts  Alert[]
+  id              Int      @id // This will be the Resy Venue ID
+  slug            String   @unique
+  name            String
+  alerts          Alert[]
+  lastCheckedAt   DateTime?
+  lastCheckStatus String?
 }
 
 // Specific email alerts for a restaurant

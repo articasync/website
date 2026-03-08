@@ -58,6 +58,7 @@ export async function GET(request: Request) {
 
     console.log(`Starting 30-day availability check for: ${restaurant.name}`);
     let totalSlotsFoundForRestaurant = 0;
+    let checkStatus = "200 OK";
 
     for (let i = 0; i < 30; i++) {
       const checkDate = new Date(today);
@@ -70,6 +71,7 @@ export async function GET(request: Request) {
 
         if (!findResponse.ok) {
           console.error(`Error fetching from Resy API: ${findResponse.status}`);
+          checkStatus = `Error ${findResponse.status}`;
           continue;
         }
 
@@ -125,12 +127,26 @@ export async function GET(request: Request) {
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(`Error scraping ${restaurant.name} on ${dateStr}:`, e);
+        checkStatus = "Error";
       }
     }
 
     console.log(`Finished checking ${restaurant.name}. Resy returned ${totalSlotsFoundForRestaurant} total slots across 30 days.`);
+
+    // Update the restaurant's last check status
+    try {
+      await prisma.restaurant.update({
+        where: { id: restaurant.id },
+        data: {
+          lastCheckedAt: new Date(),
+          lastCheckStatus: checkStatus,
+        },
+      });
+    } catch (e) {
+      console.error(`Failed to update status for ${restaurant.name}`, e);
+    }
   }
 
   // 5. SEND NOTIFICATIONS
