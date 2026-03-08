@@ -174,7 +174,7 @@ export async function GET(request: Request) {
 
       try {
         await resend.emails.send({
-          from: "Resy Alert <onboarding@resend.dev>",
+          from: process.env.RESEND_FROM_EMAIL || "Resy Alert <onboarding@resend.dev>",
           to: [email],
           subject: subject,
           text: content,
