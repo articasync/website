@@ -48,3 +48,26 @@ model NotifiedSlot {
 
   @@unique([restaurantId, slotDateTime, partySize])
 }
+// Daily Fitness Data
+model FitnessLog {
+  id                    String   @id @default(cuid())
+  date                  DateTime @unique @default(now())
+  
+  // Garmin Data
+  rhr                   Int?
+  hrv                   Int?
+  sleepScore            Int?
+  sleepHours            Float?
+  trainingReadiness     Int?
+  menstrualCyclePhase   String?
+
+  // Gemini / Strava Data
+  predictedFtp          Int?
+  predictedFtpTrend     String?
+  predictedVo2          Float?
+  predictedVo2Trend     String?
+  ftpToday              Int?
+  idealWorkout          String?
+  
+  createdAt             DateTime @default(now())
+}

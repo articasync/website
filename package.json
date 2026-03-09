@@ -10,8 +10,10 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.15.0",
     "autoprefixer": "^10.4.27",
+    "garmin-connect": "^1.6.2",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
