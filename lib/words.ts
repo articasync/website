@@ -120,8 +120,13 @@ export async function getWordsForDayFromDB(
   const w1 = unchosen[0];
   const w2 = unchosen[1];
 
-  await prisma.dailyWord.create({
-    data: {
+  await prisma.dailyWord.upsert({
+    where: { date: historicalDate },
+    update: {
+      word1: w1.word,
+      word2: w2.word
+    },
+    create: {
       date: historicalDate,
       word1: w1.word,
       word2: w2.word
