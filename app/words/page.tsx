@@ -89,7 +89,7 @@ function WordCard({ wordData }: { wordData: WordData }) {
         
         {wordData.examples && wordData.examples.length > 0 && (
           <div>
-            <h4 className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Example</h4>
+            <h4 className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Examples</h4>
             <ul className="list-disc pl-5 text-gray-600 italic space-y-1 marker:text-orange-300">
               {wordData.examples.map((ex, i) => (
                 <li key={i} className="leading-relaxed">"{ex}"</li>

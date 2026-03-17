@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       result += `Definition:\n${w.definitions.join("\n")}\n`;
     }
     if (w.examples && w.examples.length > 0) {
-      result += `Example:\n${w.examples.join("\n")}\n`;
+      result += `Examples:\n${w.examples.join("\n")}\n`;
     }
     if (w.synonyms) {
       result += `Synonyms: ${w.synonyms}\n`;
