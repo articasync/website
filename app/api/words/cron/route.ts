@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { getWords, getDaysSinceEpoch, getWordsForDay, WordData } from "@/lib/words";
+import { getWords, getWordsForDayFromDB, WordData } from "@/lib/words";
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -22,9 +22,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: "No words available to send." });
   }
 
-  const today = new Date();
-  const daysSinceEpoch = getDaysSinceEpoch(today);
-
   const formatSingleWord = (w: WordData, index: number) => {
     let result = `${index}. ${w.word.charAt(0).toUpperCase() + w.word.slice(1)}\n`;
     result += `Part of Speech: ${w.part_of_speech}\n`;
@@ -43,10 +40,21 @@ export async function GET(request: Request) {
   const formatWords = (ws: [WordData, WordData] | null) => 
     ws ? `${formatSingleWord(ws[0], 1)}\n\n${formatSingleWord(ws[1], 2)}` : "N/A";
 
-  const todayWords = formatWords(getWordsForDay(daysSinceEpoch, words));
-  const yesterdayWords = formatWords(getWordsForDay(daysSinceEpoch - 1, words));
-  const weekAgoWords = formatWords(getWordsForDay(daysSinceEpoch - 7, words));
-  const monthAgoWords = formatWords(getWordsForDay(daysSinceEpoch - 30, words));
+  const today = new Date();
+  
+  const yesterday = new Date(today);
+  yesterday.setUTCDate(today.getUTCDate() - 1);
+
+  const weekAgo = new Date(today);
+  weekAgo.setUTCDate(today.getUTCDate() - 7);
+
+  const monthAgo = new Date(today);
+  monthAgo.setUTCDate(today.getUTCDate() - 30);
+
+  const todayWords = formatWords(await getWordsForDayFromDB(today, words));
+  const yesterdayWords = formatWords(await getWordsForDayFromDB(yesterday, words));
+  const weekAgoWords = formatWords(await getWordsForDayFromDB(weekAgo, words));
+  const monthAgoWords = formatWords(await getWordsForDayFromDB(monthAgo, words));
 
   const subject = `Words of the Day - ${today.toLocaleDateString("en-US", { timeZone: "America/New_York" })}`;
   

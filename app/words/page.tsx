@@ -1,7 +1,9 @@
-import { getWords, getDaysSinceEpoch, getWordsForDay, WordData } from "@/lib/words";
+import { getWords, getWordsForDayFromDB, WordData } from "@/lib/words";
 import React from "react";
 
-export default function WordsPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function WordsPage() {
   const words = getWords();
   
   if (words.length === 0) {
@@ -13,12 +15,20 @@ export default function WordsPage() {
   }
 
   const today = new Date();
-  const daysSinceEpoch = getDaysSinceEpoch(today);
+  
+  const yesterday = new Date(today);
+  yesterday.setUTCDate(today.getUTCDate() - 1);
 
-  const todayWords = getWordsForDay(daysSinceEpoch, words);
-  const yesterdayWords = getWordsForDay(daysSinceEpoch - 1, words);
-  const weekAgoWords = getWordsForDay(daysSinceEpoch - 7, words);
-  const monthAgoWords = getWordsForDay(daysSinceEpoch - 30, words);
+  const weekAgo = new Date(today);
+  weekAgo.setUTCDate(today.getUTCDate() - 7);
+
+  const monthAgo = new Date(today);
+  monthAgo.setUTCDate(today.getUTCDate() - 30);
+
+  const todayWords = await getWordsForDayFromDB(today, words);
+  const yesterdayWords = await getWordsForDayFromDB(yesterday, words);
+  const weekAgoWords = await getWordsForDayFromDB(weekAgo, words);
+  const monthAgoWords = await getWordsForDayFromDB(monthAgo, words);
 
   return (
     <div className="max-w-4xl mx-auto py-8">

@@ -48,3 +48,13 @@ model NotifiedSlot {
 
   @@unique([restaurantId, slotDateTime, partySize])
 }
+
+// Track words chosen each day
+model DailyWord {
+  id        String   @id @default(cuid())
+  word1     String
+  word2     String
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+}
+

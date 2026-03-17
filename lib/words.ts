@@ -53,6 +53,8 @@ export function getWords(): WordData[] {
   return words;
 }
 
+import prisma from "@/lib/prisma";
+
 export function getDaysSinceEpoch(date: Date): number {
   const epoch = new Date("2024-01-01T12:00:00Z").getTime();
   const dtf = new Intl.DateTimeFormat("en-US", {
@@ -71,16 +73,52 @@ export function getDaysSinceEpoch(date: Date): number {
   return Math.round((d - epoch) / msPerDay);
 }
 
-export function getWordsForDay(
-  daysSinceEpoch: number,
-  words: WordData[]
-): [WordData, WordData] | null {
-  if (words.length === 0) return null;
-  const total = words.length;
-  let idx1 = (daysSinceEpoch * 2) % total;
-  let idx2 = (daysSinceEpoch * 2 + 1) % total;
-  if (idx1 < 0) idx1 += total;
-  if (idx2 < 0) idx2 += total;
+export async function getWordsForDayFromDB(
+  date: Date,
+  allWords: WordData[]
+): Promise<[WordData, WordData] | null> {
+  if (allWords.length === 0) return null;
 
-  return [words[idx1], words[idx2]];
+  // Normalize date to prevent timezone shifts when checking DB 
+  const historicalDate = new Date(date);
+  historicalDate.setUTCHours(0, 0, 0, 0);
+
+  const existing = await prisma.dailyWord.findUnique({
+    where: { date: historicalDate }
+  });
+
+  if (existing) {
+    const w1 = allWords.find(w => w.word === existing.word1) || allWords[0];
+    const w2 = allWords.find(w => w.word === existing.word2) || allWords[1];
+    return [w1, w2];
+  }
+
+  // Not in database? Grab all previously chosen words 
+  const chosenRecords = await prisma.dailyWord.findMany({
+    select: { word1: true, word2: true }
+  });
+
+  const chosenSet = new Set<string>();
+  chosenRecords.forEach((r: { word1: string; word2: string }) => {
+    chosenSet.add(r.word1);
+    chosenSet.add(r.word2);
+  });
+
+  let unchosen = allWords.filter(w => !chosenSet.has(w.word));
+  if (unchosen.length < 2) {
+    unchosen = allWords; // Simple recycle behavior
+  }
+
+  const w1 = unchosen[0];
+  const w2 = unchosen[1];
+
+  await prisma.dailyWord.create({
+    data: {
+      date: historicalDate,
+      word1: w1.word,
+      word2: w2.word
+    }
+  });
+
+  return [w1, w2];
 }
