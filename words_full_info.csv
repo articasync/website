@@ -2,7 +2,7 @@ word,part_of_speech,definition,example,synonyms
 abjure,v,"formally reject or disavow a formerly held belief, usually under pressure",She abjured her beliefs; He retracted his earlier statements about his religion,"forswear, recant, resile, retract"
 abrogate,v,revoke formally,,
 abstruse,s,difficult to penetrate; incomprehensible to one of ordinary understanding or knowledge,the professor's lectures were so abstruse that students tended to avoid them; some recondite problem in historiography; a deep metaphysical theory,"deep, recondite"
-acapus,,,,
+acapus,s,not producing fruit; sterile (often spelled acarpous),a barren acarpous tree,"barren, infertile, sterile"
 acidulous,s,being sour to the taste,,"acid, acidic, acidulent"
 acquisitive,a,eager to acquire and possess things especially material possessions or ideas,an acquisitive society in which the craving for material things seems never satisfied; an acquisitive mind,
 acrid,s,strong and sharp; harsh or corrosive in tone,"her acrid remarks make her many enemies; bitter words; an acerbic tone piercing otherwise flowery prose; blistering criticism; a vitriolic critique; a barrage of acid comments; a sulfurous denunciation; the pungent taste of radishes; the acrid smell of burning rubber; caustic jokes about political assassination, talk-show hosts and medical ethics","acerb, acerbic, acid, bitter, blistering, caustic, pungent, sulfurous, sulphurous, virulent, vitriolic"
@@ -37,7 +37,7 @@ apocryphal,"s, a",being of questionable authenticity; of or belonging to the Apo
 apogee,n,a final climactic stage; apoapsis in Earth orbit; the point in its orbit where a satellite is at the greatest distance from the Earth,their achievements stand as a culmination of centuries of development,culmination
 apothegm,n,a short pithy instructive saying,,"aphorism, apophthegm"
 apotheosis,n,the elevation of a person (as to the status of a god); model of excellence or perfection of a kind; one having no equal,,"deification, exaltation, ideal, nonesuch, nonpareil, nonsuch, paragon, saint"
-appertuant,,,,
+appertuant,s,relating or pertinent to (often spelled appurtenant),an appurtenant structure,"appurtenant, applicable"
 apposite,s,being of striking appropriateness and pertinence,an apt reply; the successful copywriter is a master of apposite and evocative verbal images,"apt, pertinent"
 appreciable,s,enough to be estimated or measured,appreciable amounts of noxious wastes are dumped into the harbor,
 appropriate,"a, v","suitable for a particular person or place or condition etc; take possession of by force, as after an invasion; give or assign a resource to a particular person or cause",The army seized the town; a funeral conducted the appropriate solemnity; The militia captured the castle; I will earmark this money for your research; it seems that an apology is appropriate; a book not appropriate for children; the invaders seized the land and property of the inhabitants; She sets aside time for meditation every day,"allow, capture, conquer, earmark, reserve, seize, set aside"
@@ -56,7 +56,7 @@ askance,"s, r",with a side or oblique glance; with suspicion or disapproval; (us
 asseverate,v,state categorically,,"assert, maintain"
 assiduously,r,with care and persistence,she worked assiduously on the senior thesis,
 astride,r,with the legs stretched far apart; with one leg on each side,she sat astride the chair,astraddle
-atemporal,,,,
+atemporal,s,free from limitations of time,an atemporal conception of God,"timeless, ageless"
 attar,n,essential oil or perfume obtained from flowers,,"atar, athar, ottar"
 attenuate,"s, v","become weaker, in strength, value, or magnitude; weaken the consistency of (a chemical substance); reduced in strength",the faded tones of an old recording,"attenuated, faded, rarefy, weakened"
 austere,s,of a stern or strict bearing or demeanor; forbidding in aspect; practicing great self-denial; - William James; severely simple,an austere expression; a stern face; a stark interior; a spartan existence; a spartan diet; Be systematically ascetic...do...something for no other reason than that you would rather not do it; a desert nomad's austere life,"ascetic, ascetical, severe, spartan, stark, stern"
@@ -115,7 +115,7 @@ capacious,s,large in capacity,she carried a capacious bag,
 carping,"n, v",raise trivial objections; persistent petty and unjustified criticism,,"carp, cavil, chicane, faultfinding"
 cataclysm,n,a sudden violent change in the earth's surface; an event resulting in great loss and misfortune,the whole city was affected by the irremediable calamity; the earthquake was a disaster,"calamity, catastrophe, disaster, tragedy"
 catholic,"n, s, a",of or relating to or supporting Catholicism; free from provincial prejudices or attachments; a member of a Catholic church,the Catholic Church; catholic in one's tastes,
-cavail,,,,
+cavail,v,make petty or unnecessary objections (often spelled cavil),they caviled at the cost of the project,"carp, cavil, nitpick, quibble"
 cavalier,"n, s",a gallant or courtly gentleman; given to haughty disregard of others; a royalist supporter of Charles I during the English Civil War,,"Royalist, chevalier, high-handed"
 cede,v,relinquish possession or control over; give over; surrender or relinquish to the physical control of another,The squatters had to surrender the building after the police moved in,"concede, deliver, give up, grant, surrender, yield"
 celerity,n,a rate that is rapid,,"quickness, rapidity, rapidness, speediness"
@@ -127,7 +127,7 @@ chauvinist,n,an extreme bellicose nationalist; a person with a prejudiced belief
 checkered,"s, v","marked by changeable fortune; patterned with alternating squares of color; mark into squares or draw squares on; draw crossed lines on; variegate with different colors, shades, or patterns",a checkered business career,"check, checked, checker, chequer, chequered"
 choleric,s,characterized by anger; easily moved to anger; - H.G.Wells; quickly aroused to anger,a hotheaded commander; men of the choleric type take to kicking and smashing; a choleric outburst; an irascible response,"hot-tempered, hotheaded, irascible, quick-tempered, short-tempered"
 churlish,s,rude and boorish; having a bad disposition; surly; - Shakespeare,churlish as a bear,
-circumbulate,,,,
+circumbulate,v,walk all the way around something (often spelled circumambulate),circumambulate the temple,"circumambulate, circle"
 circumlocution,n,an indirect way of expressing something; a style that involves indirect ways of expressing things,,"ambage, indirect expression, periphrasis"
 coeval,"n, s",a person of nearly the same age as another; of the same period,,"coetaneous, contemporaneous, contemporary"
 coeval,"n, s",a person of nearly the same age as another; of the same period,,"coetaneous, contemporaneous, contemporary"
@@ -153,9 +153,9 @@ cornucopia,n,a goat's horn filled with grain and flowers and fruit symbolizing p
 corollary,n,a practical consequence that follows naturally; (logic) an inference that follows directly from the proof of another proposition,blind jealousy is a frequent corollary of passionate love,
 corroborate,v,give evidence for; support with evidence or authority or make more certain or confirm; establish or strengthen as with new evidence or facts,his story confirmed my doubts; The evidence supports the defendant; The stories and claims were born out by the evidence,"affirm, bear out, confirm, substantiate, support, sustain, underpin, validate"
 cosseted,v,treat with excessive indulgence,grandparents often pamper the children; Let's not mollycoddle our students!,"baby, cocker, coddle, cosset, featherbed, indulge, mollycoddle, pamper, spoil"
-costiveness,,,,
+costiveness,n,the state of being slow or reluctant in speech or action; constipation,his costiveness in sharing his feelings,"reluctance, reticence"
 coterminous,s,being of equal extent or scope or duration,,"coextensive, conterminous"
-couched in,,,,
+couched in,v,expressed in a specified way,a warning couched in polite language,"expressed, stated, phrased"
 cow,"n, v","subdue, restrain, or overcome by affecting with a feeling of awe; frighten (as with threats); mature female of mammals of which the male is called `bull'; female of domestic cattle:; a large unpleasant woman",`moo-cow' is a child's term,"moo-cow, overawe"
 cozen,v,act with artful deceit; cheat or trick; be false to; be dishonest with,He cozened the money out of the old man,"deceive, delude, lead on"
 credence,n,the mental attitude that something is believable and should be accepted as true; a kind of sideboard or buffet,he gave credence to the gossip; acceptance of Newtonian mechanics was unquestioned for 200 years,"acceptance, credenza"
@@ -173,7 +173,7 @@ demonstrative,"n, s, a",a pronoun that points out an intended referent; given to
 denigrate,v,charge falsely or with malicious intent; attack the good name and reputation of someone; cause to seem less serious; play down,The journalists have defamed me!; Don't belittle his influence; The article in the paper sullied my reputation,"asperse, belittle, besmirch, calumniate, defame, derogate, minimize, slander, smear, smirch, sully"
 denigrate,v,charge falsely or with malicious intent; attack the good name and reputation of someone; cause to seem less serious; play down,The journalists have defamed me!; Don't belittle his influence; The article in the paper sullied my reputation,"asperse, belittle, besmirch, calumniate, defame, derogate, minimize, slander, smear, smirch, sully"
 denuded,"s, v",without the natural or usual covering; lay bare,denude a forest; a bald spot on the lawn; bare hills,"bald, bare, denudate, denude, strip"
-depredate,,,,
+depredate,v,plunder and pillage,the invaders depredated the countryside,"plunder, pillage, ravage, sack"
 descant,"n, v",talk at great length about something of one's interest; sing by changing register; sing by yodeling; a decorative musical accompaniment (often improvised) added above a basic melody; sing in descant,The Austrians were yodeling in the mountains,"discant, warble, yodel"
 descry,v,catch sight of,,"espy, spot, spy"
 desecrate,v,remove the consecration from a person or an object; violate the sacred character of a place or language,desecrate a cemetery; profane the name of God; violate the sanctity of the church,"deconsecrate, outrage, profane, unhallow, violate"
@@ -201,7 +201,7 @@ doggedly,r,with obstinate determination,he pursued her doggedly,tenaciously
 doggedness,n,persistent determination,,"perseverance, persistence, persistency, pertinacity, tenaciousness, tenacity"
 doleful,s,filled with or evoking sadness,stared with mournful eyes; the child's doleful expression; mournful news,mournful
 dolorous,s,showing sorrow,,"dolourous, lachrymose, tearful, weeping"
-doughty,,,,
+doughty,s,brave and persistent,his doughty spirit kept him going,"fearless, dauntless, determined, resolute"
 dramaturgy,n,the art of writing and producing plays,,"dramatic art, dramatics, theater, theatre"
 droll,s,comical in an odd or whimsical manner,a droll little man with a quiet tongue-in-cheek kind of humor,
 dulcet,s,extremely pleasant in a gentle way; pleasing to the ear,the dulcet tones of the cello; the most dulcet swimming on the most beautiful and remote beaches,"honeyed, mellifluous, mellisonant, sweet"
@@ -227,7 +227,7 @@ enjoin,v,issue an injunction; give instructions to or direct somebody to do some
 enmity,n,a state of deep-seated ill-will; the feeling of a hostile person,he could no longer contain his hostility,"antagonism, hostility, ill will"
 enormity,n,the quality of being outrageous; vastness of size or extent; the quality of extreme wickedness; an act of extreme wickedness,universities recognized the enormity of their task; in careful usage the noun enormity is not used to express the idea of great size,outrageousness
 ensorcelled,s,under a spell,,bewitched
-envince,,,,
+envince,v,reveal the presence of a quality or feeling (often spelled evince),his letters evince the excitement he felt,"evince, reveal, show, manifest"
 epigram,n,a witty saying,,quip
 equipoise,n,equality of distribution,,"balance, counterbalance, equilibrium"
 ergo,r,(used as a sentence connector) therefore or consequently,,
@@ -322,7 +322,7 @@ histrionic,s,characteristic of acting or a stage performance; often affected,his
 hobble,"n, v",walk impeded by some physical limitation or injury; a shackle for the ankles or feet; hamper the action or progress of; strap the foreleg and hind leg together on each side (of a horse) in order to keep the legs on the same side moving in unison; the uneven manner of walking that results from an injured leg,The chairman was hobbled by the all-powerful dean; The old woman hobbles down to the store every day; hobble race horses,"fetter, gimp, hitch, hopple, limp"
 homespun,"n, s",of textiles; having a rough surface; a rough loosely woven fabric originally made with yarn that was spun at home; characteristic of country life; made of cloth spun or woven in the home,a sweater knitted of nubbly homespun yarns; cracker-barrel philosophy; the air of homespun country boys; homespun garments; folksy humor; homespun linen,"cracker-barrel, folksy, nubbly, nubby, slubbed, tweedy"
 hoodwink,v,influence by slyness; conceal one's true motives from especially by elaborately feigning good intentions so as to gain an end,He bamboozled his professors into thinking that he knew the subject well,"bamboozle, beguile, juggle, lead by the nose, play false, pull the wool over someone's eyes, snow"
-humbuggery,,,,
+humbuggery,n,deceptive or false talk or behavior,we saw through his humbuggery,"deceit, hypocrisy, sham, fraud"
 husband,"n, v",a married man; a woman's partner in marriage; use cautiously and frugally,conserve your energy for the ascent to the summit; I try to economize my spare time,"conserve, economise, economize, hubby, married man"
 ignominious,s,(used of conduct or character) deserving or bringing disgrace or shame; - Rachel Carson,an opprobrious monument to human greed; inglorious defeat; a shameful display of cowardice; an ignominious retreat; Man...has written one of his blackest records as a destroyer on the oceanic islands,"black, disgraceful, inglorious, opprobrious, shameful"
 ignominy,n,a state of dishonor,one mistake brought shame to all his family; suffered the ignominy of being sent to prison,"disgrace, shame"
@@ -347,10 +347,10 @@ imprudent,"s, a",lacking wise self-restraint; not prudent or wise; ; - A.M.Schle
 impudent,s,marked by casual disrespect; improperly forward or bold,a flip answer to serious question; don't be fresh with me; impertinent of a child to lecture a grownup; the student was kept in for impudent behavior; Don't get wise with me!; an impudent boy given to insulting strangers,"flip, fresh, impertinent, insolent, overbold, sassy, saucy, smart, snotty-nosed, wise"
 impugn,v,attack as false or wrong,,
 impunity,n,exemption from punishment or loss,,
-impussiant,,,,
+impussiant,s,unable to take effective action; powerless (often spelled impuissant),an impuissant observer,"powerless, impuissant, weak, feeble"
 inalienable,"s, a",incapable of being repudiated or transferred to another; not subject to forfeiture,an unforfeitable right; endowed by their Creator with certain unalienable rights,"unalienable, unforfeitable"
 inanity,n,total lack of meaning or ideas,,"mindlessness, pointlessness, senselessness, vacuity"
-inasmuch,,,,
+inasmuch,r,to the extent that; in so far as,"inasmuch as you are here, you might as well help","since, considering that"
 inborn,s,normally existing at birth; present at birth but not necessarily hereditary; acquired during fetal development,mankind's connatural sense of the good,"congenital, connatural, inbred, innate"
 inchoate,s,only partly in existence; imperfectly formed,an incipient tumor; a vague inchoate idea; incipient civil disorder,incipient
 incipient,s,only partly in existence; imperfectly formed,an incipient tumor; a vague inchoate idea; incipient civil disorder,inchoate
@@ -410,7 +410,7 @@ lascivious,s,driven by lust; preoccupied with or exhibiting lustful desires,libi
 lassitude,n,weakness characterized by a lack of vitality or energy; a state of comatose torpor (as found in sleeping sickness); a feeling of lack of interest or energy,,"inanition, languor, lethargy, listlessness, slackness, sluggishness"
 legerdemain,n,an illusory feat; considered magical by naive observers,,"conjuration, conjuring trick, deception, illusion, magic, magic trick, thaumaturgy, trick"
 legion,"n, s",a vast multitude; a large military unit; amounting to a large indefinite number; archaic terms for army; association of ex-servicemen,Palomar's fans are legion; numerous times; the French Foreign Legion; the American Legion; the family was numerous,"horde, host, numerous"
-lickspittle,,,,
+lickspittle,n,a person who behaves obsequiously to those in power,a lickspittle to the boss,"sycophant, toady, flatterer, flunky"
 limpid,s,(of language) transparently clear; easily understandable; ; ; - Robert Burton; transmitting light; able to be seen through with clarity; clear and bright,eyes shining with a liquid luster; pellucid prose; a luculent oration; the cold crystalline water of melted snow; crystal clear skies; could see the sand on the bottom of the limpid pool; the liquid air of a spring morning; lucid air; transparent crystal; a pellucid brook; a perspicuous argument; limpid blue eyes; writes in a limpid style; lucid directions; a crystal clear explanation,"crystal clear, crystalline, liquid, lucid, luculent, pellucid, perspicuous, transparent"
 lissome,s,moving and bending with ease,,"lissom, lithe, lithesome, slender, supple, svelte, sylphlike"
 listless,s,lacking zest or vivacity; marked by low spirits; showing no enthusiasm,reacted to the crisis with listless resignation; he was listless and bored; a dispirited and divided Party,dispirited
@@ -453,7 +453,7 @@ monolithic,s,imposing in size or bulk or solidity; characterized by massiveness 
 mordant,"n, s","of a substance, especially a strong acid; capable of destroying or eating away by chemical action; harshly ironic or sinister; a substance used to treat leather or other materials before dyeing; aids in dyeing process",black humor; a grim joke; fun ranging from slapstick clowning ... to savage mordant wit; grim laughter,"black, caustic, corrosive, erosive, grim, vitriolic"
 moribund,s,not growing or changing; without force or vitality; being on the point of death; breathing your last,a moribund patient,stagnant
 motile,"n, s",(of spores or microorganisms) capable of movement; one whose prevailing mental imagery takes the form of inner feelings of action,,
-muck rack,,,,
+muck rack,v,search out and publicize scandal about famous people (often spelled muckrake),journalists who muckrake,"muckrake, expose, unearth"
 mulct,"n, v",impose a fine on; deprive of by deceit; money extracted as a penalty,the cashier gypped me when he gave me too little change; She defrauded the customers who trusted her; he was fined for littering; He swindled me out of my inheritance,"amercement, bunco, con, defraud, diddle, fine, gip, goldbrick, gyp, hornswoggle, nobble, rook, scam, short-change, swindle, victimize"
 multifarious,s,having many aspects,multifarious interests; a multifaceted undertaking; the multifarious noise of a great city; a many-sided subject; a miscellaneous crowd,"many-sided, miscellaneous, multifaceted"
 munificent,s,very generous,prodigal praise; the critics were lavish in their praise; called for unstinting aid to Britain; his unstinted devotion; his father gave him a half-dollar and his mother a quarter and he thought them munificent; unsparing generosity; a munificent gift; distributed gifts with a lavish hand,"lavish, overgenerous, too-generous, unsparing, unstinted, unstinting"
@@ -481,11 +481,11 @@ occlusive,"n, a",tending to occlude; a consonant produced by stopping the flow o
 odious,s,unequivocally detestable; ; ; ; - Edmund Burke,abominable treatment of prisoners; execrable crimes; detestable vices; consequences odious to those you govern,"abominable, detestable, execrable"
 officious,s,intrusive in a meddling or offensive manner,busy about other people's business; an interfering old woman; bustling about self-importantly making an officious nuisance of himself,"busy, busybodied, interfering, meddlesome, meddling"
 oligopoly,n,(economics) a market in which control over the supply of a commodity is in the hands of a small number of producers and each one can influence prices and affect competitors,,
-opaque v pellucid,,,,
+opaque v pellucid,n,contrast between hidden (opaque) and transparently clear (pellucid),an opaque vs pellucid writing style,unclear vs clear
 ornery,s,having a difficult and contrary disposition; - Dorothy Sayers,a cantankerous and venomous-tongued old lady,"cantankerous, crotchety"
 orotund,s,(of sounds) full and rich; ostentatiously lofty in style,a man given to large talk; pear-shaped vowels; tumid political prose; orotund tones; the rotund and reverberating phrase,"bombastic, declamatory, large, pear-shaped, rotund, round, tumid, turgid"
 otiose,s,producing no result or effect; disinclined to work or exertion; serving no useful purpose; having no excuse for being,senseless violence; a futile effort; otiose lines in a play; shiftless idle youth; an unavailing attempt; advice is wasted words; too lazy to wash the dishes; an otiose undertaking; the therapy was ineffectual; an indolent hanger-on; a pointless remark; faineant kings under whose rule the country languished; the unemployed are not necessarily work-shy; a life essentially purposeless; slothful employees,"faineant, futile, indolent, ineffectual, lazy, pointless, purposeless, senseless, slothful, superfluous, unavailing, wasted, work-shy"
-overween,,,,
+overween,v,be arrogant or conceited,his overweening pride,"presume, boast"
 overweening,s,"presumptuously arrogant; ; - S.V.Benet; - NY Times; unrestrained, especially with regard to feelings",overweening greed; extravagant praise; had a witty but overweening manner; no idea how overweening he would be; exuberant compliments; overweening ambition; getting a little uppity and needed to be slapped down,"excessive, extravagant, exuberant, uppity"
 pacific,"n, s, a",promoting peace; the largest ocean in the world; relating to or bordering the Pacific Ocean; disposed to peace or of a peaceful nature,in a peaceable and orderly manner; the pacific temper seeks to settle disputes on grounds of justice rather than by force; the result of this pacific policy was that no troops were called up; a quiet and peaceable person; Pacific islands,"Pacific Ocean, peaceable"
 paean,n,(ancient Greece) a hymn of praise (especially one sung in ancient Greece to invoke or thank a deity); a formal expression of praise,,"encomium, eulogy, panegyric, pean"
@@ -520,7 +520,7 @@ peremptory,s,putting an end to all debate or action; offensively self-assured or
 perforce,r,by necessity; by force of circumstance,,
 perfunctory,s,as a formality only; hasty and without attention to detail; not thorough,a casual (or cursory) inspection failed to reveal the house's structural flaws; a passing glance; a one-candidate pro forma election; perfunctory courtesy,"casual, cursory, passing, pro forma"
 peripatetic,"n, s, a",a person who walks from place to place; traveling especially on foot; of or relating to Aristotle or his philosophy; a follower of Aristotle or an adherent of Aristotelianism,peripatetic country preachers; Aristotelean logic; a poor wayfaring stranger,"Aristotelean, Aristotelian, Aristotelic, wayfaring"
-perjogative,,,,
+perjogative,n,a right or privilege exclusive to a particular individual or class (often spelled prerogative),it's your prerogative,"prerogative, privilege, right"
 perquisite,n,an incidental benefit awarded for certain types of employment (especially if it is regarded as a right); a right reserved exclusively by a particular person or group (especially a hereditary or official right),a limousine is one of the fringe benefits of the job; suffrage was the prerogative of white adult males,"exclusive right, fringe benefit, perk, prerogative, privilege"
 perspicacious,s,mentally acute or penetratingly discerning; acutely insightful and wise,"chaos could be prevented only by clear-sighted leadership; much too perspicacious to be taken in by such a spurious argument; observant and thoughtful, he was given to asking sagacious questions; a source of valuable insights and sapient advice to educators; much too perspicacious to be taken in by so spurious an argument; too clear-eyed not to see what problems would follow","clear-eyed, clear-sighted, sagacious, sapient"
 pert,s,characterized by a lightly pert and exuberant quality,a certain irreverent gaiety and ease of manner,"impertinent, irreverent, saucy"
@@ -540,12 +540,12 @@ piquant,s,attracting or delighting; having an agreeably pungent taste; engagingl
 pith,"n, v",remove the pith from (a plant); soft spongelike central cylinder of the stems of most flowering plants; the choicest or most essential or most vital part of some idea or experience,the gist of the prosecutor's argument; the nub of the story; the heart and soul of the Republican Party,"center, centre, core, essence, gist, heart, heart and soul, inwardness, kernel, marrow, meat, nitty-gritty, nub, substance, sum"
 pittance,n,an inadequate payment,they work all day for a mere pittance,
 placid,s,not easily irritated; (of a body of water) free from disturbance by heavy waves,the quiet waters of a lagoon; scarcely a ripple on the still water; an equable temper; remained placid despite the repeated delays; a lake of tranquil blue water reflecting a tranquil blue sky; unruffled water; not everyone shared his placid temperament; a smooth channel crossing; a ribbon of sand between the angry sea and the placid bay,"equable, even-tempered, good-tempered, quiet, smooth, still, tranquil, unruffled"
-plaintext,,,,
+plaintext,n,"text that is not computationally tagged, specially formatted, or written in code",send passwords in plaintext,"unformatted text, cleartext"
 plaintive,s,expressing sorrow,,mournful
 plangent,s,loud and resounding,plangent bells; the plangent minority,
 plasticity,n,the property of being physically malleable; the property of something that can be worked or hammered or shaped without breaking,,malleability
 plucky,"s, a",marked by courage and determination in the face of difficulties or danger; robust and uninhibited; ; -Judith Crist; showing courage,you have to admire her; it was a gutsy thing to do; a gutsy red wine; the champion is faced with a feisty challenger; the gutsy...intensity of her musical involvement,"feisty, gutsy, spunky"
-plutocracy (oligarchy),,,,
+plutocracy (oligarchy),n,government by the wealthy,a society moving towards plutocracy,"oligarchy, elite rule"
 poignant,s,arousing affect; keenly distressing to the mind or feelings,poignant grief cannot endure forever; his gratitude was simple and touching; the homecoming of the released hostages was an affecting scene; poignant anxiety,"affecting, touching"
 polemic,"n, s",a controversy (especially over a belief or dogma); a writer who argues in opposition to others (especially in theology); of or involving dispute or controversy,,"polemical, polemicist, polemist"
 ponderous,s,having great mass and weight and unwieldiness; labored and dull; slow and laborious because of weight,the heavy tread of tired troops; a ponderous burden; a ponderous yawn; a ponderous stone; ponderous weapons; a ponderous speech; ponderous prehistoric beasts; moved with a lumbering sag-bellied trot,"heavy, lumbering"
@@ -553,7 +553,7 @@ portentous,s,puffed up with vanity; ; ; ; - Newsweek; of momentous or ominous si
 posit,"n, v",put before; take as a given; assume as a postulate or axiom; (logic) a proposition that is accepted as true in order to provide a basis for logical reasoning; put (something somewhere) firmly,deposit the suitcase on the bench; He posited three basic laws of nature; fix your eyes on this spot; She posited her hand on his shoulder; I submit to you that the accused is guilty,"deposit, fix, postulate, put forward, situate, state, submit"
 potentate,n,a ruler who is unconstrained by law,,dictator
 potentiate,v,increase the effect of or act synergistically with (a drug or a physiological or biochemical phenomenon),potentiate the drug,
-potopurri,,,,
+potopurri,n,a mixture of things (often spelled potpourri),a potpourri of musical styles,"potpourri, medley, mixture, pastiche, mishmash"
 powwow,"n, v","hold a powwow, talk, conference or meeting; (informal) a quick private conference; a council of or with Native Americans",,huddle
 prate,"n, v",idle or foolish and irrelevant talk; speak (about unimportant matters) rapidly and incessantly,,"blab, blabber, blether, chatter, chin music, clack, gabble, gibber, idle talk, maunder, palaver, piffle, prattle, tattle, tittle-tattle, twaddle"
 prattle,"n, v",idle or foolish and irrelevant talk; speak (about unimportant matters) rapidly and incessantly,,"blab, blabber, blether, chatter, chin music, clack, gabble, gibber, idle talk, maunder, palaver, piffle, prate, tattle, tittle-tattle, twaddle"
@@ -561,7 +561,7 @@ pre-empt,n,a high bid that is intended to prevent the opposing players from bidd
 precept,n,rule of personal conduct; a doctrine that is taught,he believed all the Christian precepts; the teachings of religion,"commandment, principle, teaching"
 precipitate,"n, s, v","fall vertically, sharply, or headlong; hurl or throw violently; done with very great haste and without due deliberation; - Shakespeare; - Arthur Geddes; bring about abruptly; fall from clouds; separate as a fine suspension of solid particles; a precipitated solid substance in suspension or after settling or filtering","hasty makeshifts take the place of planning; The crisis precipitated by Russia's revolution; Our economy precipitated into complete ruin; rejected what was regarded as an overhasty plan for reconversion; rain, snow and sleet were falling; hasty marriage seldom proveth well; Vesuvius precipitated its fiery, destructive rage on Herculaneum; wondered whether they had been rather precipitate in deposing the king; The bridge broke and precipitated the train into the river below","come down, fall, hasty, overhasty, precipitant, precipitous"
 precipitous,s,done with very great haste and without due deliberation; - Shakespeare; - Arthur Geddes; extremely steep,rejected what was regarded as an overhasty plan for reconversion; the precipitous hills of Chinese paintings; an abrupt canyon; hasty marriage seldom proveth well; the precipitous rapids of the upper river; a sharp drop; wondered whether they had been rather precipitate in deposing the king; hasty makeshifts take the place of planning,"abrupt, hasty, overhasty, precipitant, precipitate, sharp"
-précis,,,,
+précis,n,a summary or abstract of a text or speech,a précis of the report,"summary, synopsis, abstract"
 preclude,v,"make impossible, especially beforehand; keep from happening or arising; make impossible",My sense of tact forbids an honest answer; Your role in the projects precludes your involvement in the competitive project,"close out, forbid, foreclose, forestall, prevent, rule out"
 preempt,"n, v","make a preemptive bid in the game of bridge; gain possession of by prior right or opportunity, especially so as to obtain the right to buy (land); acquire for oneself before others can do so; a high bid that is intended to prevent the opposing players from bidding; take the place of or have precedence over",live broadcast of the presidential debate preempts the regular news hour; discussion of the emergency situation will preempt the lecture by the professor,"displace, pre-empt, preemptive bid"
 preemptive,s,designed or having the power to deter or prevent an anticipated situation or occurrence,a preemptive business offer,pre-emptive
@@ -586,9 +586,9 @@ puerile,"s, a",displaying or suggesting a lack of maturity; of or characteristic
 pugilism,n,fighting with the fists,,"boxing, fisticuffs"
 pugnacious,s,ready and able to resort to force or violence; - Herman Melville; tough and callous by virtue of experience,they were rough and determined fighting men; pugnacious spirits...lamented that there was so little prospect of an exhilarating disturbance,"hard-bitten, hard-boiled, rough"
 puissant,s,powerful,,
-punchy,,,,
+punchy,s,having an immediate impact; forceful,a punchy speech,"forceful, impactful, vigorous"
 pundit,n,someone who has been admitted to membership in a scholarly field,,"initiate, learned person, savant"
-pussiant,,,,
+pussiant,s,having great power or influence (often spelled puissant),a puissant leader,"puissant, powerful, potent, mighty"
 putrescent,s,becoming putrid,a trail lined by putrescent carcasses,
 quack,"n, s, v",utter quacking noises; act as a medical quack or a charlatan; medically unqualified; the harsh sound of a duck; an untrained person who pretends to be a physician and who dispenses medical advice,The ducks quacked; a quack doctor,
 quaff,"n, v",to swallow hurriedly or greedily or in one draught; a hearty draft,The men gulped down their beers,"gulp, swig"
@@ -607,7 +607,7 @@ rakish,s,marked by a carefree unconventionality or disreputableness; - Crary Moo
 rankle,v,gnaw into; make resentful or angry,his resentment festered; The injustice rankled her,"eat into, fret, grate"
 rapprochement,n,the reestablishing of cordial relations,,reconciliation
 rapt,s,feeling great rapture or delight,,"ecstatic, enraptured, rapturous, rhapsodic"
-raptorous,,,,
+raptorous,s,"characterized by, feeling, or expressing great pleasure or enthusiasm (often spelled rapturous)",a rapturous reception,"rapturous, ecstatic, joyful, elated"
 rebuke,"n, v",censure severely or angrily; an act or expression of criticism and censure,The mother scolded the child for entering a stranger's car; The deputy ragged the Prime Minister; he had to take the rebuke with a smile on his face; The customer dressed down the waiter for bringing cold soup,"bawl out, berate, call down, call on the carpet, chew out, chew up, chide, dress down, have words, jaw, lambast, lambaste, lecture, rag, remonstrate, reprehension, reprimand, reproof, reproval, scold, take to task, trounce"
 recalcitrant,s,marked by stubborn resistance to authority; stubbornly resistant to authority or control,a fractious animal that would not submit to the harness; a refractory child; the University suspended the most recalcitrant demonstrators,"fractious, refractory"
 recant,v,"formally reject or disavow a formerly held belief, usually under pressure",She abjured her beliefs; He retracted his earlier statements about his religion,"abjure, forswear, resile, retract"
@@ -652,7 +652,7 @@ row,"n, v","an arrangement of objects or people side by side in a line; propel w
 salacious,s,characterized by lust; suggestive of or tending to moral looseness,prurient thoughts; prurient literature; obscene telephone calls; her sensuous grace roused his lustful nature; salacious limericks; lewd whisperings of a dirty old man; eluding the lubricious embraces of her employer; a salacious rooster of a little man; an indecent gesture,"lewd, lubricious, lustful, obscene, prurient, raunchy"
 salutary,s,tending to promote physical well-being; beneficial to health,beneficial effects of a balanced diet; a good night's sleep; the salutary influence of pure air,good
 salvo,n,an outburst resembling the discharge of firearms or the release of bombs; a sudden outburst of cheers; rapid simultaneous discharge of firearms,there was a salvo of approval; our fusillade from the left flank caught them by surprise,"burst, fusillade, volley"
-sangfroid,,,,
+sangfroid,n,"composure or coolness, sometimes excessive, as shown in danger or under trying circumstances",he recovered his sangfroid,"composure, equanimity, self-possession, coolness"
 sanguinary,s,marked by eagerness to resort to violence and bloodshed; ; ; -G.W.Johnson; accompanied by bloodshed,went after the collaborators with a sanguinary fury that drenched the land with blood; bloody-minded tyrants; bloodthirsty yells; this bitter and sanguinary war,"bloodthirsty, bloody-minded, butcherly, gory, sanguineous, slaughterous"
 sate,v,fill to satisfaction,I am sated,"fill, replete, satiate"
 scintillating,"s, v",physics: fluoresce momentarily when struck by a charged particle or high-energy photon; brilliantly clever; marked by high spirits or excitement; give off; reflect brightly; having brief brilliant points or flashes of light; emit or reflect light in a flickering manner; be lively or brilliant or exhibit virtuosity,Does a constellation twinkle more brightly than a single star?; the phosphor fluoresced; a row of sparkly cheerleaders; his fertile effervescent mind; shop window full of glittering Christmas trees; scintillating personality; his playing coruscated throughout the concert hall; the scintillating stars; A scintillating conversation; bugle beads all aglitter; scintillating wit; Unquarried marble sparkled on the hillside; a play full of scintillating dialogue; glinting water; `glistering' is an archaic term; glinting eyes; the substance scintillated sparks and flashes; a dress with sparkly sequins; glittery costume jewelry; The musical performance sparkled; scintillant mica; his glittering eyes were cold and malevolent,"aglitter, bubbling, coruscant, coruscate, effervescent, frothy, fulgid, glinting, glistering, glittering, glittery, scintillant, scintillate, sparkle, sparkly, twinkle, winkle"
@@ -663,10 +663,10 @@ scruple,"n, v",an ethical or moral principle that inhibits action; have doubts a
 scrupulous,"s, a",having scruples; arising from a sense of right and wrong; principled; characterized by extreme care and great effort,less scrupulous producers sent bundles that were deceptive in appearance; painstaking research; conscientious application to the work at hand; scrupulous attention to details,"conscientious, painstaking"
 sedition,n,an illegal action inciting resistance to lawful authority and tending to cause the disruption or overthrow of the government,,
 sedulous,s,marked by care and persistent effort,assiduous research; sedulous pursuit of legal and moral principles; her assiduous attempts to learn French,assiduous
-self styled,,,,
+self styled,s,using a description or title that one has given oneself,a self-styled expert,"so-called, would-be, self-appointed"
 self-styled,s,as claimed by and for yourself often without justification,the self-styled `doctor' has no degree of any kind,soi-disant
 sententious,s,concise and full of meaning; ; - Hervey Allen; abounding in or given to pompous or aphoristic moralizing; - Kathleen Barnes,too often the significant episode deteriorates into sententious conversation; the peculiarly sardonic and sententious style in which Don Luis composed his epigrams; welcomed her pithy comments,pithy
-sephulcral,,,,
+sephulcral,s,relating to a tomb or interment; gloomy (often spelled sepulchral),a sepulchral voice,"sepulchral, gloomy, lugubrious, somber"
 shoehorn,"n, v",a device used for easing the foot into a shoe; fit for a specific purpose even when not well suited,,
 sidle,v,move unobtrusively or furtively; move sideways,The young man began to sidle near the pretty girl sitting on the log,sashay
 simulacrum,n,a representation of a person (especially in the form of sculpture); an insubstantial or vague semblance,the emperor's tomb had his image carved in stone; the coin bears an effigy of Lincoln,"effigy, image"
@@ -707,7 +707,7 @@ stricture,n,abnormal narrowing of a bodily canal or passageway; severe criticism
 stringent,s,demanding strict attention to rules and procedures,stringent safety measures; rigorous discipline; tight security,"rigorous, tight"
 stygian,s,dark and dismal as of the rivers Acheron and Styx in Hades; ; -Wordsworth; hellish; - Milton,in the depths of an Acheronian forest; upon those roseate lips a Stygian hue; Hence loathed Melancholy.../In Stygian cave forlorn,"Acheronian, Acherontic"
 stymie,"n, v",a thwarting and distressing situation; a situation in golf where an opponent's ball blocks the line between your ball and the hole; hinder or prevent the progress or accomplishment of,His brother blocked him at every turn,"block, blockade, embarrass, hinder, obstruct, stymy"
-stymie or stymy,,,,
+stymie or stymy,v,prevent or hinder the progress of,the changes must not be allowed to stymie new medical treatments,"hinder, thwart, foil, impede"
 subsume,v,consider (an instance of something) as part of a general rule or principle; contain or include,This new system subsumes the old one,colligate
 suffuse,v,"to become overspread as with a fluid, a colour, a gleam of light; cause to spread or flush or flood through, over, or across",His whole frame suffused with a cold dew; The sky was suffused with a warm pink color,perfuse
 sullen,s,showing a brooding ill humor; ; ; ; ; ; - Bruce Bliven; darkened by clouds,"a dark scowl; a sullen crowd; the proverbially dour New England Puritan; a sour temper; a saturnine, almost misanthropic young genius; a morose and unsociable manner; a heavy sky; a glum, hopeless shrug; he sat in moody silence","dark, dour, glowering, glum, heavy, lowering, moody, morose, saturnine, sour, threatening"
@@ -721,7 +721,7 @@ tabulation,n,the act of putting into tabular form; information set out in tabula
 taciturn,a,habitually reserved and uncommunicative,,
 tact,n,consideration in dealing with others and avoiding giving offense,,tactfulness
 tawdry,s,cheap and shoddy; - Judith Crist; tastelessly showy,cheapjack moviemaking...that feeds on the low taste of the mob; a flashy ring; garish colors; a meretricious yet stylish book; tawdry ornaments; a gaudy costume; a flash car; loud sport shirts,"brassy, cheap, cheapjack, flash, flashy, garish, gaudy, gimcrack, loud, meretricious, shoddy, tacky, tatty, trashy"
-telos,,,,
+telos,n,an ultimate object or aim,the telos of the universe,"aim, goal, purpose, objective"
 temerity,n,fearless daring,,"audaciousness, audacity"
 temperance,n,the trait of avoiding excesses; abstaining from excess; the act of tempering,,"moderation, sobriety"
 tempered,"a, v","restrain; adjusted or attuned by adding a counterbalancing element; bring to a desired consistency, texture, or hardness by a process of gradually heating and cooling; adjust the pitch (of pianos); harden by reheating and cooling in oil; made hard or flexible or resilient especially by heat treatment; make more temperate, acceptable, or suitable by adding something else; moderate",tempered glass; temper glass; criticism tempered with kindly sympathy; temper steel; a sword of tempered steel; she tempered her criticism,"anneal, chasten, harden, hardened, moderate, mollify, normalize, season, temper, toughened, treated"
@@ -739,7 +739,7 @@ travail,"n, v",use of physical or mental energy; hard work; concluding state of 
 travesty,"n, v","a composition that imitates or misrepresents somebody's style, usually in a humorous way; a comedy characterized by broad satire and improbable situations; make a travesty of",,"burlesque, charade, farce, farce comedy, lampoon, mockery, parody, pasquinade, put-on, sendup, spoof, takeoff"
 treacly,s,overly sweet,,"cloying, saccharine, syrupy"
 trenchant,s,"having keenness and forcefulness and penetration in thought, expression, or intellect; characterized by or full of force and vigor; clearly or sharply defined to the mind",trenchant distinctions between right and wrong; searching insights; trenchant criticism; Claudius was the first to invade Britain with distinct...intentions of conquest; a trenchant argument; clear-cut evidence of tampering; a hard-hitting expose,"clear-cut, distinct, hard-hitting, searching"
-triapse,,,,
+triapse,v,walk or move wearily or reluctantly (often spelled traipse),students traipse across campus,"traipse, trudge, trek"
 trifling,"n, s, v",consider not very seriously; not worth considering; act frivolously; the deliberate act of delaying and playing instead of working; waste time; spend one's time idly or inefficiently,He is trifling with her; a trifling matter; She plays with the thought of moving to Tasmania; he considered the prize too paltry for the lives it must cost; piffling efforts,"dalliance, dally, dawdling, frivol, negligible, paltry, piddle, piddle away, play, trifle, wanton, wanton away"
 trite,s,repeated too often; overfamiliar through overuse,the trite metaphor `hard as nails'; repeating threadbare jokes; bromidic sermons; parroting some timeworn axiom; his remarks were trite and commonplace; a stock answer; hackneyed phrases,"banal, commonplace, hackneyed, old-hat, shopworn, stock, threadbare, timeworn, tired, well-worn"
 truculence,n,obstreperous and defiant aggressiveness,,truculency
@@ -756,7 +756,7 @@ undergird,v,lend moral support to; make secure underneath,undergird the ship,bra
 underwrite,v,protect by insurance; guarantee financial support of,The opera tour was subvented by a bank; The insurance won't cover this,"cover, insure, subvent, subvention"
 unequivocal,"s, a",admitting of no doubt or misunderstanding; having only one meaning or interpretation and leading to only one conclusion; clearly defined or formulated; - R.B.Taney,the plain and unequivocal language of the laws; took an unequivocal position; unequivocal evidence; an unequivocal promise; an unequivocal success; an unequivocal (or univocal) statement,"definitive, unambiguous, univocal"
 unflappable,s,not easily perturbed or excited or upset; marked by extreme calm and composure,"an imperturbable self-possession; unflappable in a crisis; hitherto imperturbable, he now showed signs of alarm",imperturbable
-unforthcoming,,,,
+unforthcoming,s,not cooperative or willing to provide information,the police were unforthcoming,"uncooperative, reticent, tight-lipped"
 unimpeachable,s,free of guilt; not subject to blame; completely acceptable; not open to exception or reproach; beyond doubt or reproach,an unimpeachable reputation; a judge's ethics should be unexceptionable; of irreproachable character; an unimpeachable source; two unexceptionable witnesses; has lived a blameless life,"blameless, inculpable, irreproachable, unexceptionable"
 unnerve,v,disturb the composure of,,"enervate, faze, unsettle"
 unprepossessing,s,creating an unfavorable or neutral first impression,,unpresentable
@@ -770,11 +770,11 @@ untenable,s,(of theories etc) incapable of being defended or justified,,indefens
 unthinking,"s, r",mentally sluggish; without care or thought for others; not exhibiting or characterized by careful thought; in a thoughtless manner,the thoughtless saying of a great princess on being informed that the people had no bread; `Let them eat cake'; he stared thoughtlessly at the picture,"lumpen, lumpish, thoughtless, thoughtlessly, uncaring, unreflective, unthinkingly, unthoughtful"
 untoward,s,contrary to your interests or welfare; not in keeping with accepted standards of what is right or proper in polite society,indecorous behavior; language unbecoming to a lady; adverse circumstances; moved to curb their untoward ribaldry; made a place for themselves under the most untoward conditions; unseemly to use profanity; was buried with indecent haste,"adverse, inauspicious, indecent, indecorous, unbecoming, uncomely, unseemly"
 untrammeled,s,not confined or limited; - Russell Lord; - Farley Mowat,the gift of a fresh eye and an untrammeled curiosity; the untrammeled rush that the snows had shown in the first spring sun,untrammelled
-unviable,,,,
+unviable,s,not capable of working successfully; not feasible,an unviable plan,"impracticable, unfeasible, unworkable"
 upbraid,v,express criticism towards,The president reproached the general for his irresponsible behavior,reproach
 upshot,n,a phenomenon that follows and is caused by some previous phenomenon,he acted very wise after the event; his decision had depressing consequences for business; the magnetic effect was greater when the rod was lengthwise,"consequence, effect, event, issue, outcome, result"
 vacuous,s,devoid of intelligence; void of expression; devoid of matter; devoid of significance or point,a vacuous space; vacuous comments; a blank stare; a hollow victory; empty promises,"asinine, blank, empty, fatuous, hollow, inane, mindless"
-vangaurd,,,,
+vangaurd,n,a group of people leading the way in new developments or ideas (often spelled vanguard),the vanguard of the revolution,"forefront, vanguard, advance guard"
 vanguard,n,the leading units moving at the head of an army; any creative group active in the innovation and application of new concepts and techniques in a given field (especially in the arts); the position of greatest importance or advancement; the leading position in any movement or field,the idea of motion was always to the forefront of his mind and central to his philosophy; the Cotswolds were once at the forefront of woollen manufacturing in England,"avant-garde, cutting edge, forefront, new wave, van"
 venial,s,warranting only temporal punishment; easily excused or forgiven,venial sin; a venial error,"excusable, forgivable, minor"
 verdant,s,characterized by abundance of verdure,,
