@@ -75,7 +75,8 @@ export function getDaysSinceEpoch(date: Date): number {
 
 export async function getWordsForDayFromDB(
   date: Date,
-  allWords: WordData[]
+  allWords: WordData[],
+  allowGenerate: boolean = true
 ): Promise<[WordData, WordData] | null> {
   if (allWords.length === 0) return null;
 
@@ -88,13 +89,16 @@ export async function getWordsForDayFromDB(
   });
 
   if (existing) {
-    const w1 = allWords.find(w => w.word === existing.word1) || {
-      word: existing.word1, part_of_speech: "N/A", definitions: ["Word no longer in CSV"], examples: [], synonyms: ""
-    };
-    const w2 = allWords.find(w => w.word === existing.word2) || {
-      word: existing.word2, part_of_speech: "N/A", definitions: ["Word no longer in CSV"], examples: [], synonyms: ""
-    };
-    return [w1, w2];
+    const w1 = allWords.find(w => w.word === existing.word1);
+    const w2 = allWords.find(w => w.word === existing.word2);
+    
+    if (w1 && w2) {
+      return [w1, w2];
+    }
+  }
+
+  if (!allowGenerate) {
+    return null;
   }
 
   // Not in database? Grab all previously chosen words 

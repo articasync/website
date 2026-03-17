@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   };
 
   const formatWords = (ws: [WordData, WordData] | null) => 
-    ws ? `${formatSingleWord(ws[0], 1)}\n\n${formatSingleWord(ws[1], 2)}` : "N/A";
+    ws ? `${formatSingleWord(ws[0], 1)}\n\n${formatSingleWord(ws[1], 2)}` : "Words not generated yet.";
 
   const today = new Date();
   
@@ -51,10 +51,10 @@ export async function GET(request: Request) {
   const monthAgo = new Date(today);
   monthAgo.setUTCDate(today.getUTCDate() - 30);
 
-  const todayWords = formatWords(await getWordsForDayFromDB(today, words));
-  const yesterdayWords = formatWords(await getWordsForDayFromDB(yesterday, words));
-  const weekAgoWords = formatWords(await getWordsForDayFromDB(weekAgo, words));
-  const monthAgoWords = formatWords(await getWordsForDayFromDB(monthAgo, words));
+  const todayWords = formatWords(await getWordsForDayFromDB(today, words, true));
+  const yesterdayWords = formatWords(await getWordsForDayFromDB(yesterday, words, false));
+  const weekAgoWords = formatWords(await getWordsForDayFromDB(weekAgo, words, false));
+  const monthAgoWords = formatWords(await getWordsForDayFromDB(monthAgo, words, false));
 
   const subject = `Words of the Day - ${today.toLocaleDateString("en-US", { timeZone: "America/New_York" })}`;
   

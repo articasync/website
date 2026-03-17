@@ -25,10 +25,10 @@ export default async function WordsPage() {
   const monthAgo = new Date(today);
   monthAgo.setUTCDate(today.getUTCDate() - 30);
 
-  const todayWords = await getWordsForDayFromDB(today, words);
-  const yesterdayWords = await getWordsForDayFromDB(yesterday, words);
-  const weekAgoWords = await getWordsForDayFromDB(weekAgo, words);
-  const monthAgoWords = await getWordsForDayFromDB(monthAgo, words);
+  const todayWords = await getWordsForDayFromDB(today, words, true);
+  const yesterdayWords = await getWordsForDayFromDB(yesterday, words, false);
+  const weekAgoWords = await getWordsForDayFromDB(weekAgo, words, false);
+  const monthAgoWords = await getWordsForDayFromDB(monthAgo, words, false);
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -47,7 +47,14 @@ export default async function WordsPage() {
 }
 
 function DaySection({ title, words, highlight = false }: { title: string, words: [WordData, WordData] | null, highlight?: boolean }) {
-  if (!words) return null;
+  if (!words) {
+    return (
+      <div className={`p-6 rounded-2xl shadow-sm border ${highlight ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-100'}`}>
+        <h2 className={`text-2xl font-bold mb-4 ${highlight ? 'text-indigo-800' : 'text-gray-400'}`}>{title}</h2>
+        <div className="text-gray-400 italic text-center py-8">Words not generated yet.</div>
+      </div>
+    );
+  }
   return (
     <div className={`p-6 rounded-2xl shadow-sm border ${highlight ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-gray-100'}`}>
       <h2 className={`text-2xl font-bold mb-4 ${highlight ? 'text-indigo-800' : 'text-gray-700'}`}>{title}</h2>
