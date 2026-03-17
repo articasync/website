@@ -117,8 +117,11 @@ export async function getWordsForDayFromDB(
     unchosen = allWords; // Simple recycle behavior
   }
 
-  const w1 = unchosen[0];
-  const w2 = unchosen[1];
+  const idx1 = Math.floor(Math.random() * unchosen.length);
+  const w1 = unchosen[idx1];
+  unchosen.splice(idx1, 1); // remove w1 so we don't pick it twice
+  const idx2 = Math.floor(Math.random() * unchosen.length);
+  const w2 = unchosen[idx2];
 
   await prisma.dailyWord.upsert({
     where: { date: historicalDate },
