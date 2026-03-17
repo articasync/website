@@ -88,8 +88,12 @@ export async function getWordsForDayFromDB(
   });
 
   if (existing) {
-    const w1 = allWords.find(w => w.word === existing.word1) || allWords[0];
-    const w2 = allWords.find(w => w.word === existing.word2) || allWords[1];
+    const w1 = allWords.find(w => w.word === existing.word1) || {
+      word: existing.word1, part_of_speech: "N/A", definitions: ["Word no longer in CSV"], examples: [], synonyms: ""
+    };
+    const w2 = allWords.find(w => w.word === existing.word2) || {
+      word: existing.word2, part_of_speech: "N/A", definitions: ["Word no longer in CSV"], examples: [], synonyms: ""
+    };
     return [w1, w2];
   }
 
