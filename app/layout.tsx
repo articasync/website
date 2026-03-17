@@ -25,6 +25,7 @@ export default function RootLayout({
             <div className="container mx-auto px-4 sm:px-8 py-3 flex space-x-6">
               <Link href="/" className="text-gray-600 hover:text-black font-medium transition-colors">Home</Link>
               <Link href="/resy" className="text-gray-600 hover:text-black font-medium transition-colors">Resy</Link>
+              <Link href="/words" className="text-gray-600 hover:text-black font-medium transition-colors">Words</Link>
             </div>
           </nav>
           <div className="container mx-auto p-4 sm:p-8">

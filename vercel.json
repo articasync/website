@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/resy/cron",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/words/cron",
+      "schedule": "0 13 * * *"
+    }
+  ]
+}
