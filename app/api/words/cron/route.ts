@@ -25,8 +25,23 @@ export async function GET(request: Request) {
   const today = new Date();
   const daysSinceEpoch = getDaysSinceEpoch(today);
 
+  const formatSingleWord = (w: WordData, index: number) => {
+    let result = `${index}. ${w.word.charAt(0).toUpperCase() + w.word.slice(1)}\n`;
+    result += `Part of Speech: ${w.part_of_speech}\n`;
+    if (w.definitions && w.definitions.length > 0) {
+      result += `Definition:\n${w.definitions.join("\n")}\n`;
+    }
+    if (w.examples && w.examples.length > 0) {
+      result += `Example:\n${w.examples.join("\n")}\n`;
+    }
+    if (w.synonyms) {
+      result += `Synonyms: ${w.synonyms}\n`;
+    }
+    return result.trim();
+  };
+
   const formatWords = (ws: [WordData, WordData] | null) => 
-    ws ? `- ${ws[0].word} (${ws[0].part_of_speech}): ${ws[0].definition}\n- ${ws[1].word} (${ws[1].part_of_speech}): ${ws[1].definition}` : "N/A";
+    ws ? `${formatSingleWord(ws[0], 1)}\n\n${formatSingleWord(ws[1], 2)}` : "N/A";
 
   const todayWords = formatWords(getWordsForDay(daysSinceEpoch, words));
   const yesterdayWords = formatWords(getWordsForDay(daysSinceEpoch - 1, words));

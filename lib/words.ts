@@ -4,7 +4,9 @@ import path from "path";
 export interface WordData {
   word: string;
   part_of_speech: string;
-  definition: string;
+  definitions: string[];
+  examples: string[];
+  synonyms: string;
 }
 
 export function parseCSVLine(text: string): string[] {
@@ -40,9 +42,11 @@ export function getWords(): WordData[] {
     const parts = parseCSVLine(lines[i]);
     if (parts.length >= 3) {
       words.push({
-        word: parts[0],
-        part_of_speech: parts[1],
-        definition: parts.slice(2).join(",").trim(),
+        word: parts[0] || "",
+        part_of_speech: parts[1] || "",
+        definitions: (parts[2] || "").split(";").map(s => s.trim()).filter(Boolean),
+        examples: (parts[3] || "").split(";").map(s => s.trim()).filter(Boolean),
+        synonyms: parts[4] || "",
       });
     }
   }

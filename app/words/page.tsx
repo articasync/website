@@ -52,17 +52,43 @@ function DaySection({ title, words, highlight = false }: { title: string, words:
 
 function WordCard({ wordData }: { wordData: WordData }) {
   return (
-    <div className="group relative bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-default">
-      <div className="flex items-baseline justify-between mb-1">
-        <span className="text-xl font-bold text-gray-800 capitalize">{wordData.word}</span>
-        <span className="text-sm font-medium text-gray-500 italic">{wordData.part_of_speech}</span>
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <div className="flex items-baseline gap-2 mb-4 border-b border-gray-100 pb-3">
+        <span className="text-2xl font-bold text-gray-800 capitalize">{wordData.word}</span>
+        <span className="text-sm font-medium text-gray-500 italic">({wordData.part_of_speech})</span>
       </div>
       
-      {/* Tooltip on hover */}
-      <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300 left-0 bottom-full mb-2 w-full p-3 bg-gray-900 text-white text-sm rounded-lg shadow-xl pointer-events-none z-10">
-        <div className="font-semibold mb-1 capitalize">{wordData.word}</div>
-        <div className="break-words">{wordData.definition}</div>
-        <div className="absolute w-3 h-3 bg-gray-900 transform rotate-45 left-1/2 -ml-1.5 -bottom-1.5"></div>
+      <div className="space-y-4">
+        {wordData.definitions && wordData.definitions.length > 0 && (
+          <div>
+            <h4 className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-2">Definition</h4>
+            <ul className="list-disc pl-5 text-gray-700 space-y-1 marker:text-indigo-300">
+              {wordData.definitions.map((def, i) => (
+                <li key={i} className="leading-relaxed">{def}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {wordData.examples && wordData.examples.length > 0 && (
+          <div>
+            <h4 className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Example</h4>
+            <ul className="list-disc pl-5 text-gray-600 italic space-y-1 marker:text-orange-300">
+              {wordData.examples.map((ex, i) => (
+                <li key={i} className="leading-relaxed">"{ex}"</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {wordData.synonyms && (
+          <div>
+            <h4 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">Synonyms</h4>
+            <p className="text-gray-700 leading-relaxed text-sm bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+              {wordData.synonyms}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
