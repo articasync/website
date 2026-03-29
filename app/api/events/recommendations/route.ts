@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET(request: Request) {
   try {
