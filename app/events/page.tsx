@@ -139,8 +139,9 @@ export default function EventsPage() {
       toast.success(isSkip ? "Skipped!" : isPin ? "Pinned to upcoming!" : "Rated!");
 
       if (isPin) {
-        fetchPinned(); // refresh pins if pinned
+        fetchPinned(); // refresh pins if it was pinned
       }
+      fetchHistory(); // refresh both for live logs updates
 
       // Fetch a replacement for this specific event
       const replaceRes = await fetch("/api/events/recommendations?single=true");
