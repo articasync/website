@@ -15,7 +15,6 @@ export async function GET(request: Request) {
     // 1. Fetch past interactions (ratings, pins)
     const history = await prisma.eventInteraction.findMany({
       orderBy: { createdAt: "desc" },
-      take: 20, // get the last 20 interactions for context
     });
 
     // 2. Fetch general guidance
