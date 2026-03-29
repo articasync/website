@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -141,6 +142,8 @@ export async function POST(request: Request) {
       include: { restaurant: true },
     });
 
+    revalidateTag("resy-alerts");
+
     return NextResponse.json(
       {
         id: newAlert.id,
@@ -174,6 +177,8 @@ export async function DELETE(request: Request) {
     await prisma.alert.delete({
       where: { id: id },
     });
+
+    revalidateTag("resy-alerts");
 
     return NextResponse.json({ message: "Alert deleted" });
   } catch (e: any) {

@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
+import { unstable_cache } from "next/cache";
+
+const getCachedAlerts = unstable_cache(
+  async () => {
+    return await prisma.alert.findMany({
+      include: { restaurant: true },
+    });
+  },
+  ["resy-alerts-cache"],
+  { tags: ["resy-alerts"] }
+);
 
 export const maxDuration = 300; // Allow Vercel to run up to 5 minutes (300 seconds) if they have the plan that supports it
 export const dynamic = 'force-dynamic';
@@ -27,10 +38,8 @@ export async function GET(request: Request) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  // 3. GET DATA FROM DATABASE
-  const alerts = await prisma.alert.findMany({
-    include: { restaurant: true },
-  });
+  // 3. GET DATA FROM DATABASE (CACHED TO AVOID WAKING NEON)
+  const alerts = await getCachedAlerts();
 
   if (!alerts.length) {
     return NextResponse.json({ message: "No alerts configured." });
@@ -140,15 +149,18 @@ export async function GET(request: Request) {
 
     console.log(`Finished checking ${restaurant.name}. Resy returned ${totalSlotsFoundForRestaurant} total slots across 30 days.`);
 
-    // Update the restaurant's last check status
+    // Update the restaurant's last check status (only once an hour or on error to save Neon compute hours)
     try {
-      await prisma.restaurant.update({
-        where: { id: restaurant.id },
-        data: {
-          lastCheckedAt: new Date(),
-          lastCheckStatus: checkStatus,
-        },
-      });
+      const shouldUpdateDb = checkStatus !== "200 OK" || new Date().getMinutes() === 0;
+      if (shouldUpdateDb) {
+        await prisma.restaurant.update({
+          where: { id: restaurant.id },
+          data: {
+            lastCheckedAt: new Date(),
+            lastCheckStatus: checkStatus,
+          },
+        });
+      }
     } catch (e) {
       console.error(`Failed to update status for ${restaurant.name}`, e);
     }
