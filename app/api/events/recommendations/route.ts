@@ -45,7 +45,7 @@ Consider the following sources of events as inspiration (pull from similar types
 - NYC Resistor Calendar: https://www.nycresistor.com/calendar/
 - Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
 
-Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time" (MUST include specific time e.g., "7:00 PM" if known, or "All Day" if unspecified, along with the date), "link", and "why" (a single sentence explaining why you recommended this based on their history or guidance).
+Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time" (MUST use strict format: 'Weekday, Month Day, Year, Time' e.g., 'Tuesday, March 31, 2026, 7:00 PM' or 'All Day'), "link", and "why" (a single sentence explaining why you recommended this based on their history or guidance).
 CRITICAL for "link": Only output real, verified links. Never hallucinate deep links. If you aren't 100% sure about a specific URI structure, just output the main calendar/home URL for that site from the seed list (e.g. \`https://www.theskint.com/\` or \`https://www.nycresistor.com/calendar/\`).
 `;
 

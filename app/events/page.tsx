@@ -108,6 +108,21 @@ export default function EventsPage() {
     }
   };
 
+  const handleUnpin = async (id: string) => {
+    try {
+      await fetch("/api/events/interactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, pinned: false }),
+      });
+      toast.success("Removed from Upcoming!");
+      fetchHistory();
+      fetchPinned(); // Refresh pins too
+    } catch {
+      toast.error("Failed to unpin");
+    }
+  };
+
   const saveGuidance = () => {
     // Only apply in current generation (no DB write)
     fetchRecommendations(guidance);
@@ -195,21 +210,28 @@ export default function EventsPage() {
       </header>
 
       {/* Pinned / Upcoming Events Section */}
-      {pinnedEvents.length > 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-pink-100 rounded-lg text-pink-600">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold">Upcoming & Pinned</h2>
+      {/* Upcoming Events Section (Always visible) */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-pink-100 rounded-lg text-pink-600">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold">Upcoming</h2>
+        </div>
+        
+        {pinnedEvents.length === 0 ? (
+          <p className="text-xs text-zinc-500 bg-white p-3 rounded-md border border-zinc-200">No events saved here yet. Pin items from the queue!</p>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pinnedEvents.map((event) => (
               <div key={event.id} className="bg-white rounded-md p-2 shadow-sm border border-gray-100 relative group transition-all flex flex-col justify-between h-[100px]">
                 <div>
-                  <h3 className="text-xs font-bold text-gray-900 truncate" title={event.description}>{event.title}</h3>
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-xs font-bold text-gray-900 truncate" title={event.description}>{event.title}</h3>
+                    <button onClick={() => handleUnpin(event.id)} className="text-xs text-red-500 hover:text-red-700 font-bold p-1">X</button>
+                  </div>
                   <p className="text-slate-500 text-[10px] font-medium truncate">{event.time}</p>
                 </div>
                 {event.link && (
@@ -218,8 +240,8 @@ export default function EventsPage() {
               </div>
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Dynamic Recommendation Queue */}
       <section className="bg-zinc-50 rounded-xl shadow-sm border border-zinc-200 p-4 space-y-3">
