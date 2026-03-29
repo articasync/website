@@ -236,9 +236,14 @@ export default function EventsPage() {
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="flex items-center space-x-4 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-[60px]">
-                  {/* Event Info (Title & Hover Why & Link) */}
-                  <div className="w-1/3 min-w-0 pr-2 cursor-help flex flex-col justify-center" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
+                <div key={event.id} className="flex items-center space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-[60px]">
+                  {/* Physical Question Mark Target */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
+                    ?
+                  </div>
+
+                  {/* Event Info (Title & Link) - Wider than before */}
+                  <div className="w-[45%] min-w-0 pr-2 flex flex-col justify-center">
                     <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800">{event.title}</h3>
                     <div className="flex items-center space-x-2 text-xs truncate">
                       <p className="text-zinc-500 truncate">{event.time}</p>
@@ -248,7 +253,7 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  {/* Inputs and Actions in a horizontal flex layout */}
+                  {/* Inputs and Actions in a horizontal flex layout - Shrunk reason box automatically */}
                   <div className="flex-1 flex items-center space-x-3">
                     {/* Rating mini number box */}
                     <div className="flex items-center space-x-1">
