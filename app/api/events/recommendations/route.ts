@@ -24,8 +24,11 @@ export async function GET(request: Request) {
       `- ${h.title} (Rating: ${h.rating ?? "N/A"}, Reason: ${h.reason ?? "N/A"}, Pinned: ${h.pinned}, Skipped: ${h.skipped})`
     ).join("\n");
 
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
     const prompt = `
 Generate ${countToGenerate} event recommendation(s) in New York City. 
+Current Date of Reference: ${today}. You MUST use exact dates for events (e.g. "Tuesday, March 31, 2026") instead of relative terms like "This Tuesday" or "Tomorrow".
 
 Here is the user's general curation guidance:
 "${guidance}"
