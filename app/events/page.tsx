@@ -27,6 +27,10 @@ interface Interaction {
 export default function EventsPage() {
   const [recommendations, setRecommendations] = useState<EventRecommendation[]>([]);
   const [pinnedEvents, setPinnedEvents] = useState<Interaction[]>([]);
+  const [historyEvents, setHistoryEvents] = useState<Interaction[]>([]);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<{ rating: number; reason: string }>({ rating: 5, reason: "" });
   const [guidance, setGuidance] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -34,6 +38,8 @@ export default function EventsPage() {
 
   useEffect(() => {
     fetchRecommendations("");
+    fetchPinned();
+    fetchHistory();
   }, []);
 
   const fetchRecommendations = async (currentGuidance: string) => {
@@ -65,6 +71,41 @@ export default function EventsPage() {
       const data = await res.json();
       setPinnedEvents(data);
     } catch {}
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await fetch("/api/events/interactions");
+      const data = await res.json();
+      if (Array.isArray(data)) setHistoryEvents(data);
+    } catch {}
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      await fetch(`/api/events/interactions?id=${id}`, { method: "DELETE" });
+      toast.success("Deleted from history!");
+      fetchHistory();
+      fetchPinned(); // Refresh pins if it was pinned
+    } catch {
+      toast.error("Failed to delete event interaction");
+    }
+  };
+
+  const handleEditSave = async (id: string) => {
+    try {
+      await fetch("/api/events/interactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...editFields }),
+      });
+      toast.success("Updated history record!");
+      setEditingId(null);
+      fetchHistory();
+      fetchPinned(); // Refresh pins too
+    } catch {
+      toast.error("Failed to update");
+    }
   };
 
   const saveGuidance = () => {
@@ -253,6 +294,83 @@ export default function EventsPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </section>
+
+      {/* Collapsible History Panel */}
+      <section className="bg-zinc-50 rounded-xl shadow-sm border border-zinc-200 p-4 space-y-3">
+        <button 
+          onClick={() => setShowHistory(!showHistory)}
+          className="w-full flex justify-between items-center text-sm font-bold text-zinc-900 border-b border-zinc-200 pb-1"
+        >
+          <span>History & Logs ({historyEvents.length})</span>
+          <span>{showHistory ? "▲ Collapse" : "▼ Expand"}</span>
+        </button>
+
+        {showHistory && (
+          <div className="space-y-1">
+            {historyEvents.length === 0 ? (
+              <p className="text-xs text-zinc-500">No past history recorded.</p>
+            ) : (
+              historyEvents.map((h) => (
+                <div key={h.id} className="flex items-center space-x-3 p-1.5 border border-zinc-100 rounded-md bg-white text-xs h-[52px]">
+                  <div className="w-1/3 min-w-0 pr-2 cursor-help truncate" title={h.description}>
+                    <h3 className="font-bold text-zinc-900 truncate">{h.title}</h3>
+                    <div className="flex items-center space-x-2 text-[10px] truncate">
+                      <p className="text-zinc-500 truncate">{h.time}</p>
+                      {h.pinned && <span className="text-emerald-700 font-bold">Pinned</span>}
+                      {h.skipped && <span className="text-red-700 font-bold">Skipped</span>}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 flex items-center space-x-2">
+                    {editingId === h.id ? (
+                      <>
+                        <input
+                          type="number"
+                          min="0"
+                          max="10"
+                          value={editFields.rating}
+                          onChange={(e) => setEditFields(p => ({ ...p, rating: parseInt(e.target.value) }))}
+                          className="w-10 text-xs px-1 py-1 rounded-md border border-zinc-200"
+                        />
+                        <input
+                          type="text"
+                          value={editFields.reason}
+                          onChange={(e) => setEditFields(p => ({ ...p, reason: e.target.value }))}
+                          className="flex-1 text-xs px-2 py-1 rounded-md border border-zinc-200"
+                        />
+                        <button onClick={() => handleEditSave(h.id)} className="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md">Save</button>
+                        <button onClick={() => setEditingId(null)} className="px-2 py-1 bg-gray-200 text-gray-700 rounded-md">X</button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex-1 flex items-center space-x-2">
+                          <span className="font-bold">[{h.rating ?? 0}/10]:</span>
+                          <span className="truncate text-zinc-600 flex-1">{h.reason || "No reason"}</span>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            setEditingId(h.id);
+                            setEditFields({ rating: h.rating ?? 5, reason: h.reason || "" });
+                          }} 
+                          className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-zinc-700 font-medium rounded-md h-[26px]"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => deleteHistoryItem(h.id)} 
+                          className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-md h-[26px]"
+                        >
+                          Del
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </section>

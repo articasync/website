@@ -48,3 +48,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, rating, reason, pinned, skipped } = body;
+
+    const updated = await prisma.eventInteraction.update({
+      where: { id },
+      data: { rating, reason, pinned, skipped },
+    });
+
+    return NextResponse.json(updated);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+
+    const deleted = await prisma.eventInteraction.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(deleted);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
