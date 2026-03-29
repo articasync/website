@@ -185,13 +185,13 @@ export default function EventsPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-4 font-sans text-sm text-stone-800">
       {/* Soft Neutral Architectural Header & Guidance */}
-      <header className="bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-xl p-4 shadow-sm flex justify-between items-center space-x-4">
+      <header className="bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-xl p-4 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 space-x-0 md:space-x-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight">NYC Discovery</h1>
           <p className="text-xs text-zinc-600">Personalized Events.</p>
         </div>
         
-        <div className="flex-1 max-w-lg flex items-center space-x-2">
+        <div className="w-full md:flex-1 max-w-lg flex items-center space-x-2">
           <input
             type="text"
             value={guidance}
@@ -258,25 +258,27 @@ export default function EventsPage() {
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="flex items-center space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-[60px]">
-                  {/* Physical Question Mark Target */}
-                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
-                    ?
-                  </div>
+                <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto md:h-[60px]">
+                  <div className="flex items-center space-x-3 w-full md:w-[45%]">
+                    {/* Physical Question Mark Target */}
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
+                      ?
+                    </div>
 
-                  {/* Event Info (Title & Link) - Wider than before */}
-                  <div className="w-[45%] min-w-0 pr-2 flex flex-col justify-center">
-                    <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800">{event.title}</h3>
-                    <div className="flex items-center space-x-2 text-xs truncate">
-                      <p className="text-zinc-500 truncate">{event.time}</p>
-                      {event.link && (
-                        <a href={event.link} target="_blank" rel="noopener noreferrer" className="font-bold text-zinc-900 hover:underline">Link</a>
-                      )}
+                    {/* Event Info (Title & Link) - Wider on desktop */}
+                    <div className="min-w-0 pr-2 flex flex-col justify-center flex-1 truncate">
+                      <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800">{event.title}</h3>
+                      <div className="flex items-center space-x-2 text-xs truncate">
+                        <p className="text-zinc-500 truncate">{event.time}</p>
+                        {event.link && (
+                          <a href={event.link} target="_blank" rel="noopener noreferrer" className="font-bold text-zinc-900 hover:underline">Link</a>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Inputs and Actions in a horizontal flex layout - Shrunk reason box automatically */}
-                  <div className="flex-1 flex items-center space-x-3">
+                  {/* Inputs and Actions in a horizontal flex layout - Shrunk on Desktop, full width on mobile */}
+                  <div className="w-full flex md:flex-1 items-center space-x-3">
                     {/* Rating mini number box */}
                     <div className="flex items-center space-x-1">
                       <label className="text-xs font-semibold text-zinc-500">Rate:</label>
