@@ -63,6 +63,7 @@ model EventInteraction {
   title        String
   description String
   time        String?
+  link        String?
   rating      Int?     // 0-10
   reason      String?
   pinned      Boolean  @default(false)

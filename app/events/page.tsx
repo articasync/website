@@ -8,6 +8,7 @@ interface EventRecommendation {
   title: string;
   description: string;
   time: string;
+  link?: string;
 }
 
 interface Interaction {
@@ -15,6 +16,7 @@ interface Interaction {
   title: string;
   description: string;
   time: string;
+  link?: string;
   rating: number;
   reason: string;
   pinned: boolean;
@@ -107,6 +109,7 @@ export default function EventsPage() {
           title: event.title,
           description: event.description,
           time: event.time,
+          link: event.link,
           rating: isSkip ? null : input.rating,
           reason: isSkip ? "Skipped" : input.reason,
           pinned: isPin,
@@ -147,20 +150,20 @@ export default function EventsPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-12">
       {/* Dynamic Header with Vibrant Background */}
-      <header className="relative bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white rounded-3xl p-8 sm:p-12 shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-white opacity-10 backdrop-blur-3xl"></div>
+      <header className="relative bg-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-white opacity-5 backdrop-blur-3xl"></div>
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
           <div>
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">NYC Event Discovery</h1>
-            <p className="text-lg text-white/90">Curated cultural experiences powered by Gemini AI, driven by your tastes.</p>
+            <p className="text-lg text-white/80">Curated cultural experiences powered by Gemini AI, driven by your tastes.</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl p-4 flex items-center space-x-4">
-            <div className="p-3 bg-white rounded-xl text-fuchsia-600 shadow">
+          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 flex items-center space-x-4">
+            <div className="p-3 bg-white rounded-xl text-slate-900 shadow">
               <span className="text-xl font-bold">5</span>
             </div>
             <div>
               <p className="text-sm font-semibold">Active Recommendations</p>
-              <p className="text-xs text-white/80">Regenerates on interaction</p>
+              <p className="text-xs text-white/60">Regenerates on interaction</p>
             </div>
           </div>
         </div>
@@ -209,11 +212,14 @@ export default function EventsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pinnedEvents.map((event) => (
-              <div key={event.id} className="bg-white rounded-2xl p-6 shadow-lg border border-pink-100 relative group transition-all hover:shadow-pink-100">
-                <span className="absolute top-4 right-4 text-xs font-semibold px-2 py-1 bg-pink-100 text-pink-700 rounded-full">Pinned</span>
+              <div key={event.id} className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 relative group transition-all hover:shadow-lg">
+                <span className="absolute top-4 right-4 text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded-full">Pinned</span>
                 <h3 className="text-lg font-bold mb-1 mt-2 text-gray-900">{event.title}</h3>
-                <p className="text-emerald-600 text-sm font-medium mb-2">{event.time}</p>
+                <p className="text-slate-600 text-sm font-medium mb-2">{event.time}</p>
                 <p className="text-gray-600 text-sm line-clamp-2">{event.description}</p>
+                {event.link && (
+                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="mt-2 text-sm text-slate-800 hover:underline inline-block font-medium">View Event Link</a>
+                )}
               </div>
             ))}
           </div>
@@ -223,7 +229,7 @@ export default function EventsPage() {
       {/* Dynamic Recommendation Queue */}
       <section className="space-y-6">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-fuchsia-100 rounded-lg text-fuchsia-600">
+          <div className="p-2 bg-slate-100 rounded-lg text-slate-800">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -233,20 +239,23 @@ export default function EventsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-fuchsia-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800"></div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col justify-between h-[450px] transition-all hover:shadow-fuchsia-100">
+                <div key={event.id} className="bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between h-[480px] transition-all hover:shadow-lg">
                   <div className="p-6 space-y-4 flex-1">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-fuchsia-600 transition-colors">{event.title}</h3>
-                      <p className="text-fuchsia-600 text-sm font-semibold mt-1">{event.time}</p>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-slate-800 transition-colors">{event.title}</h3>
+                      <p className="text-slate-600 text-sm font-semibold mt-1">{event.time}</p>
                     </div>
                     <p className="text-gray-600 text-sm overflow-hidden text-ellipsis line-clamp-4">{event.description}</p>
+                    {event.link && (
+                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-800 hover:underline font-medium inline-block">Visit Event Page</a>
+                    )}
                   </div>
 
                   <div className="border-t border-gray-100 bg-gray-50/50 p-6 rounded-b-2xl space-y-4">
@@ -254,7 +263,7 @@ export default function EventsPage() {
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-semibold text-gray-500">Interest Rating ({input.rating})</label>
-                        <span className="text-sm font-bold text-fuchsia-600">{input.rating}/10</span>
+                        <span className="text-sm font-bold text-slate-800">{input.rating}/10</span>
                       </div>
                       <input
                         type="range"
@@ -265,7 +274,7 @@ export default function EventsPage() {
                           ...prev,
                           [event.id]: { ...input, rating: parseInt(e.target.value) }
                         }))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-fuchsia-600"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-slate-800"
                       />
                     </div>
 
@@ -277,19 +286,19 @@ export default function EventsPage() {
                         ...prev,
                         [event.id]: { ...input, reason: e.target.value }
                       }))}
-                      className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-4 focus:ring-fuchsia-100 focus:border-fuchsia-500 outline-none transition-all font-sans"
+                      className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-4 focus:ring-slate-100 focus:border-slate-800 outline-none transition-all font-sans"
                     />
 
                     <div className="flex space-x-3">
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, false)}
-                        className="flex-1 py-2.5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-semibold text-sm rounded-xl transition-all shadow-lg shadow-fuchsia-100"
+                        className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl transition-all shadow-md"
                       >
                         Rate
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
-                        className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl transition-all shadow-lg shadow-emerald-100"
+                        className="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl transition-all shadow-md"
                       >
                         Pin
                       </button>

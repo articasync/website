@@ -28,13 +28,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, description, time, rating, reason, pinned, skipped } = body;
+    const { title, description, time, link, rating, reason, pinned, skipped } = body;
 
     const interaction = await prisma.eventInteraction.create({
       data: {
         title,
         description,
         time,
+        link,
         rating,
         reason,
         pinned: pinned || false,

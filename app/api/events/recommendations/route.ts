@@ -44,7 +44,7 @@ Consider the following sources of events as inspiration (pull from similar types
 - NYC Resistor Calendar: https://www.nycresistor.com/calendar/
 - Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
 
-Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", and "time".
+Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time", and "link".
 `;
 
     const model = genAI.getGenerativeModel({
