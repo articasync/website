@@ -17,11 +17,7 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    // 2. Fetch general guidance
-    const guidanceSetting = await prisma.setting.findUnique({
-      where: { key: "event_guidance" },
-    });
-    const guidance = guidanceSetting?.value || "";
+    const guidance = searchParams.get("guidance") || "";
 
     // 3. Construct prompt context
     const historyContext = history.map((h: any) => 
@@ -45,6 +41,7 @@ Consider the following sources of events as inspiration (pull from similar types
 - Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
 
 Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time", and "link".
+CRITICAL for "link": Only output real, verified links. Never hallucinate deep links. If you aren't 100% sure about a specific URI structure, just output the main calendar/home URL for that site from the seed list (e.g. \`https://www.theskint.com/\` or \`https://www.nycresistor.com/calendar/\`).
 `;
 
     const model = genAI.getGenerativeModel({

@@ -32,20 +32,17 @@ export default function EventsPage() {
   const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { rating: number; reason: string } }>({});
 
   useEffect(() => {
-    fetchRecommendations();
-    fetchPinned();
-    fetchGuidance();
+    fetchRecommendations("");
   }, []);
 
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = async (currentGuidance: string) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/events/recommendations");
+      const res = await fetch(`/api/events/recommendations?guidance=${encodeURIComponent(currentGuidance)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setRecommendations(data);
         
-        // Initialize inputs for new recommendations
         const inputs: any = {};
         data.forEach((ev: EventRecommendation) => {
           inputs[ev.id] = { rating: 5, reason: "" };
@@ -69,30 +66,10 @@ export default function EventsPage() {
     } catch {}
   };
 
-  const fetchGuidance = async () => {
-    try {
-      const res = await fetch("/api/events/guidance");
-      const data = await res.json();
-      setGuidance(data.guidance || "");
-    } catch {}
-  };
-
-  const saveGuidance = async () => {
-    setSubmitting(true);
-    try {
-      await fetch("/api/events/guidance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guidance }),
-      });
-      toast.success("Guidance saved!");
-      // Re-fetch recommendations with new guidance
-      fetchRecommendations();
-    } catch (e) {
-      toast.error("Failed to save guidance");
-    } finally {
-      setSubmitting(false);
-    }
+  const saveGuidance = () => {
+    // Only apply in current generation (no DB write)
+    fetchRecommendations(guidance);
+    toast.success("Applied guidance to current generation!");
   };
 
   const handleRateAndReplace = async (eventId: string, isPin: boolean = false, isSkip: boolean = false) => {
@@ -101,7 +78,7 @@ export default function EventsPage() {
     if (!event) return;
 
     try {
-      // Save interaction
+      // Save interaction (both pin and skip save selections)
       await fetch("/api/events/interactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,8 +87,8 @@ export default function EventsPage() {
           description: event.description,
           time: event.time,
           link: event.link,
-          rating: isSkip ? null : input.rating,
-          reason: isSkip ? "Skipped" : input.reason,
+          rating: input.rating,
+          reason: input.reason,
           pinned: isPin,
           skipped: isSkip,
         }),
@@ -148,24 +125,13 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12">
-      {/* Dynamic Header with Vibrant Background */}
-      <header className="relative bg-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl overflow-hidden">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Compact Header */}
+      <header className="relative bg-slate-900 text-white rounded-2xl p-6 shadow-md overflow-hidden">
         <div className="absolute inset-0 bg-white opacity-5 backdrop-blur-3xl"></div>
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-          <div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">NYC Event Discovery</h1>
-            <p className="text-lg text-white/80">Curated cultural experiences powered by Gemini AI, driven by your tastes.</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 flex items-center space-x-4">
-            <div className="p-3 bg-white rounded-xl text-slate-900 shadow">
-              <span className="text-xl font-bold">5</span>
-            </div>
-            <div>
-              <p className="text-sm font-semibold">Active Recommendations</p>
-              <p className="text-xs text-white/60">Regenerates on interaction</p>
-            </div>
-          </div>
+        <div className="relative z-10">
+          <h1 className="text-2xl font-bold tracking-tight">NYC Event Discovery</h1>
+          <p className="text-sm text-white/70">Powered by Gemini AI, driven by your tastes.</p>
         </div>
       </header>
 
@@ -212,13 +178,13 @@ export default function EventsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pinnedEvents.map((event) => (
-              <div key={event.id} className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 relative group transition-all hover:shadow-lg">
-                <span className="absolute top-4 right-4 text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded-full">Pinned</span>
-                <h3 className="text-lg font-bold mb-1 mt-2 text-gray-900">{event.title}</h3>
-                <p className="text-slate-600 text-sm font-medium mb-2">{event.time}</p>
-                <p className="text-gray-600 text-sm line-clamp-2">{event.description}</p>
+              <div key={event.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative group transition-all hover:shadow-md">
+                <span className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">Pinned</span>
+                <h3 className="text-md font-bold mb-1 mt-1 text-gray-900">{event.title}</h3>
+                <p className="text-slate-500 text-xs font-medium mb-1">{event.time}</p>
+                <p className="text-gray-600 text-xs line-clamp-1">{event.description}</p>
                 {event.link && (
-                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="mt-2 text-sm text-slate-800 hover:underline inline-block font-medium">View Event Link</a>
+                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="mt-1 text-xs text-slate-800 hover:underline inline-block font-medium">View Link</a>
                 )}
               </div>
             ))}
@@ -227,86 +193,82 @@ export default function EventsPage() {
       )}
 
       {/* Dynamic Recommendation Queue */}
-      <section className="space-y-6">
+      <section className="space-y-4">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-slate-100 rounded-lg text-slate-800">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold">Your Curated Recommendations</h2>
+          <h2 className="text-lg font-bold">Queue</h2>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-4">
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between h-[480px] transition-all hover:shadow-lg">
-                  <div className="p-6 space-y-4 flex-1">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-slate-800 transition-colors">{event.title}</h3>
-                      <p className="text-slate-600 text-sm font-semibold mt-1">{event.time}</p>
+                <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between h-[250px] transition-all hover:shadow-md">
+                  <div className="p-4 space-y-2 flex-1 relative">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-md font-bold text-gray-900 group-hover:text-slate-800 transition-colors">{event.title}</h3>
+                        <p className="text-slate-500 text-xs font-semibold mt-0.5">{event.time}</p>
+                      </div>
+                      {event.link && (
+                        <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-xs text-slate-800 hover:underline font-medium">Link</a>
+                      )}
                     </div>
-                    <p className="text-gray-600 text-sm overflow-hidden text-ellipsis line-clamp-4">{event.description}</p>
-                    {event.link && (
-                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-800 hover:underline font-medium inline-block">Visit Event Page</a>
-                    )}
+                    <p className="text-gray-600 text-xs overflow-hidden text-ellipsis line-clamp-3">{event.description}</p>
                   </div>
 
-                  <div className="border-t border-gray-100 bg-gray-50/50 p-6 rounded-b-2xl space-y-4">
-                    {/* Interaction Inputs */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-semibold text-gray-500">Interest Rating ({input.rating})</label>
-                        <span className="text-sm font-bold text-slate-800">{input.rating}/10</span>
+                  <div className="border-t border-gray-100 bg-gray-50/50 p-4 rounded-b-xl space-y-2">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-0.5">
+                          <label className="text-xs font-semibold text-gray-500">Rating ({input.rating})</label>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value={input.rating}
+                          onChange={(e) => setRatingInputs(prev => ({
+                            ...prev,
+                            [event.id]: { ...input, rating: parseInt(e.target.value) }
+                          }))}
+                          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-slate-800"
+                        />
                       </div>
+
                       <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={input.rating}
+                        type="text"
+                        placeholder="Reason..."
+                        value={input.reason}
                         onChange={(e) => setRatingInputs(prev => ({
                           ...prev,
-                          [event.id]: { ...input, rating: parseInt(e.target.value) }
+                          [event.id]: { ...input, reason: e.target.value }
                         }))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-slate-800"
+                        className="flex-2 text-xs px-2 py-1.5 rounded-md border border-gray-200 focus:ring-2 focus:ring-slate-100 focus:border-slate-800 outline-none transition-all font-sans"
                       />
                     </div>
 
-                    <input
-                      type="text"
-                      placeholder="Why this rating? (e.g., Love maker fairs, too expensive)"
-                      value={input.reason}
-                      onChange={(e) => setRatingInputs(prev => ({
-                        ...prev,
-                        [event.id]: { ...input, reason: e.target.value }
-                      }))}
-                      className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-4 focus:ring-slate-100 focus:border-slate-800 outline-none transition-all font-sans"
-                    />
-
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleRateAndReplace(event.id, false, false)}
-                        className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl transition-all shadow-md"
-                      >
-                        Rate
-                      </button>
+                    <div className="flex space-x-2">
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
-                        className="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl transition-all shadow-md"
+                        className="flex-1 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition-all shadow-sm"
                       >
-                        Pin
+                        Pin & Save
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
-                        className="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold text-sm rounded-xl transition-all"
+                        className="flex-1 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold text-xs rounded-lg transition-all"
                       >
-                        Skip
+                        Skip & Save
                       </button>
                     </div>
                   </div>
