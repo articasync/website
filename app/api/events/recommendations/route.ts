@@ -49,7 +49,7 @@ Output the result as a strict JSON array of objects with these exact keys: "id" 
 `;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-pro", // Switch to 1.5-pro as it is standardized on older SDK endpoints
+      model: "gemini-pro", // Fallback to original 1.0 model which has separate quotas
       generationConfig: {
         responseMimeType: "application/json",
       },
