@@ -7,6 +7,7 @@ interface EventRecommendation {
   id: string;
   title: string;
   description: string;
+  why?: string;
   time: string;
   link?: string;
 }
@@ -125,45 +126,31 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Compact Header */}
-      <header className="relative bg-slate-900 text-white rounded-2xl p-6 shadow-md overflow-hidden">
-        <div className="absolute inset-0 bg-white opacity-5 backdrop-blur-3xl"></div>
-        <div className="relative z-10">
-          <h1 className="text-2xl font-bold tracking-tight">NYC Event Discovery</h1>
-          <p className="text-sm text-white/70">Powered by Gemini AI, driven by your tastes.</p>
+    <div className="max-w-5xl mx-auto space-y-3 font-sans text-xs">
+      {/* Super Compact Header & Guidance in One Row */}
+      <header className="bg-slate-900 text-white rounded-xl p-3 shadow-md flex justify-between items-center space-x-4">
+        <div>
+          <h1 className="text-lg font-bold tracking-tight">NYC Discovery</h1>
+          <p className="text-xs text-white/70">Personalized Events.</p>
         </div>
-      </header>
-
-      {/* General Personalization Guidance Panel */}
-      <section className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center space-x-3">
-          <div className="p-2 bg-violet-100 rounded-lg text-violet-600">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold">Recommendations Guidance</h2>
-        </div>
-        <div className="p-6 space-y-4">
-          <textarea
+        
+        <div className="flex-1 max-w-lg flex items-center space-x-2">
+          <input
+            type="text"
             value={guidance}
             onChange={(e) => setGuidance(e.target.value)}
-            rows={3}
-            placeholder="E.g., 'Focus more on hands-on making workshops and free cheap music events in lower Manhattan. Skip high-ticket venues.'"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-violet-200 focus:border-violet-500 transition-all outline-none resize-none font-sans text-gray-700"
+            placeholder="Focus on maker workshops / free music..."
+            className="flex-1 text-xs px-2 py-1.5 rounded-md bg-white/10 text-white placeholder-white/40 border border-white/20 outline-none focus:bg-white/20"
           />
-          <div className="flex justify-end">
-            <button
-              onClick={saveGuidance}
-              disabled={submitting}
-              className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-200 disabled:opacity-50 transition-all transform hover:-translate-y-0.5"
-            >
-              {submitting ? "Saving..." : "Apply Guidance"}
-            </button>
-          </div>
+          <button
+            onClick={saveGuidance}
+            disabled={submitting}
+            className="px-3 py-1.5 bg-white text-slate-900 font-semibold rounded-md text-xs hover:bg-gray-100 disabled:opacity-50 transition-all font-medium h-[28px]"
+          >
+            Apply
+          </button>
         </div>
-      </section>
+      </header>
 
       {/* Pinned / Upcoming Events Section */}
       {pinnedEvents.length > 0 && (
@@ -178,13 +165,13 @@ export default function EventsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pinnedEvents.map((event) => (
-              <div key={event.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative group transition-all hover:shadow-md">
-                <span className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">Pinned</span>
-                <h3 className="text-md font-bold mb-1 mt-1 text-gray-900">{event.title}</h3>
-                <p className="text-slate-500 text-xs font-medium mb-1">{event.time}</p>
-                <p className="text-gray-600 text-xs line-clamp-1">{event.description}</p>
+              <div key={event.id} className="bg-white rounded-md p-2 shadow-sm border border-gray-100 relative group transition-all flex flex-col justify-between h-[100px]">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-900 truncate" title={event.description}>{event.title}</h3>
+                  <p className="text-slate-500 text-[10px] font-medium truncate">{event.time}</p>
+                </div>
                 {event.link && (
-                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="mt-1 text-xs text-slate-800 hover:underline inline-block font-medium">View Link</a>
+                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-800 hover:underline inline-block font-medium">Link</a>
                 )}
               </div>
             ))}
@@ -193,82 +180,72 @@ export default function EventsPage() {
       )}
 
       {/* Dynamic Recommendation Queue */}
-      <section className="space-y-4">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-slate-100 rounded-lg text-slate-800">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-bold">Queue</h2>
-        </div>
+      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 space-y-2">
+        <h2 className="text-sm font-bold border-b pb-1 flex items-center space-x-1">
+          <span>🎯 Queue</span>
+        </h2>
 
         {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
+          <div className="flex items-center justify-center h-12">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-800"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-1">
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between h-[250px] transition-all hover:shadow-md">
-                  <div className="p-4 space-y-2 flex-1 relative">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-md font-bold text-gray-900 group-hover:text-slate-800 transition-colors">{event.title}</h3>
-                        <p className="text-slate-500 text-xs font-semibold mt-0.5">{event.time}</p>
-                      </div>
-                      {event.link && (
-                        <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-xs text-slate-800 hover:underline font-medium">Link</a>
-                      )}
-                    </div>
-                    <p className="text-gray-600 text-xs overflow-hidden text-ellipsis line-clamp-3">{event.description}</p>
+                <div key={event.id} className="flex items-center space-x-3 p-1.5 border border-gray-100 rounded-lg hover:shadow-sm transition-all text-xs h-[52px]">
+                  {/* Event Info (Title & Hover Why) */}
+                  <div className="w-1/3 min-w-0 pr-2 cursor-help" title={event.why ? `🤖 Why Gemini: ${event.why}` : `ℹ️ View Description: ${event.description}`}>
+                    <h3 className="font-bold text-gray-900 truncate hover:text-slate-800">{event.title}</h3>
+                    <p className="text-slate-500 text-[10px] truncate">{event.time}</p>
                   </div>
 
-                  <div className="border-t border-gray-100 bg-gray-50/50 p-4 rounded-b-xl space-y-2">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-0.5">
-                          <label className="text-xs font-semibold text-gray-500">Rating ({input.rating})</label>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="10"
-                          value={input.rating}
-                          onChange={(e) => setRatingInputs(prev => ({
-                            ...prev,
-                            [event.id]: { ...input, rating: parseInt(e.target.value) }
-                          }))}
-                          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-slate-800"
-                        />
-                      </div>
-
+                  {/* Inputs and Actions in a horizontal flex layout */}
+                  <div className="flex-1 flex items-center space-x-2">
+                    {/* Rating mini number box */}
+                    <div className="flex items-center space-x-1">
+                      <label className="text-[10px] font-semibold text-gray-500">Rate:</label>
                       <input
-                        type="text"
-                        placeholder="Reason..."
-                        value={input.reason}
+                        type="number"
+                        min="0"
+                        max="10"
+                        value={input.rating}
                         onChange={(e) => setRatingInputs(prev => ({
                           ...prev,
-                          [event.id]: { ...input, reason: e.target.value }
+                          [event.id]: { ...input, rating: parseInt(e.target.value) }
                         }))}
-                        className="flex-2 text-xs px-2 py-1.5 rounded-md border border-gray-200 focus:ring-2 focus:ring-slate-100 focus:border-slate-800 outline-none transition-all font-sans"
+                        className="w-10 text-xs px-1 py-1 rounded-md border border-gray-200 outline-none"
                       />
                     </div>
 
-                    <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Reason..."
+                      value={input.reason}
+                      onChange={(e) => setRatingInputs(prev => ({
+                        ...prev,
+                        [event.id]: { ...input, reason: e.target.value }
+                      }))}
+                      className="flex-1 min-w-0 text-xs px-2 py-1 rounded-md border border-gray-200 outline-none"
+                    />
+
+                    {event.link && (
+                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-slate-800 hover:underline">Link</a>
+                    )}
+
+                    <div className="flex space-x-1">
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
-                        className="flex-1 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition-all shadow-sm"
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white font-medium text-[10px] rounded-md transition-all h-[26px]"
                       >
-                        Pin & Save
+                        Pin
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
-                        className="flex-1 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold text-xs rounded-lg transition-all"
+                        className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-[10px] rounded-md transition-all h-[26px]"
                       >
-                        Skip & Save
+                        Skip
                       </button>
                     </div>
                   </div>
