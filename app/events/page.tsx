@@ -40,14 +40,18 @@ export default function EventsPage() {
     try {
       const res = await fetch("/api/events/recommendations");
       const data = await res.json();
-      setRecommendations(data);
-      
-      // Initialize inputs for new recommendations
-      const inputs: any = {};
-      data.forEach((ev: EventRecommendation) => {
-        inputs[ev.id] = { rating: 5, reason: "" };
-      });
-      setRatingInputs(prev => ({ ...prev, ...inputs }));
+      if (Array.isArray(data)) {
+        setRecommendations(data);
+        
+        // Initialize inputs for new recommendations
+        const inputs: any = {};
+        data.forEach((ev: EventRecommendation) => {
+          inputs[ev.id] = { rating: 5, reason: "" };
+        });
+        setRatingInputs(prev => ({ ...prev, ...inputs }));
+      } else {
+        toast.error(data.error || "Failed to load events");
+      }
     } catch (e) {
       toast.error("Failed to fetch recommendations");
     } finally {
