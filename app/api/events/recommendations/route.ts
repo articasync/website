@@ -28,15 +28,17 @@ export async function GET(request: Request) {
 
     const prompt = `
 Generate ${countToGenerate} event recommendation(s) in New York City. 
-Current Date of Reference: ${today}. You MUST use exact dates for events (e.g. "Tuesday, March 31, 2026") instead of relative terms like "This Tuesday" or "Tomorrow".
+Current Date of Reference: ${today}. You MUST use exact dates for events (e.g. "Tuesday, March 31, 2026") instead of relative terms like "This Tuesday" or "Tomorrow". All recommended events MUST take place on or after this Reference Date. Never recommend events in the past.
 
 CRITICAL: Focus on limited-time, unique, pop-up, or special one-off events (like a guest lecture, a specific concert, or a weekend pop-up art fair). Avoid permanent attractions, long-running static Broadway shows, or standard tourist listings (unless it's an exceptional special engagement). Focus on events that if missed, won't happen again soon!
 
 Here is the user's general curation guidance:
 "${guidance}"
 
-Here are their past interactions for pattern weights (Exploit what they like and Explore adjacent interests):
+Here are their past interactions for pattern weights (Exploit what they like and Explore adjacent interests). CRITICAL: Do NOT suggest any event titles that already appear in this history:
 ${historyContext}
+
+CRITICAL: Do not recommend events you have already recommended before. Avoid duplicates.
 
 Consider the following sources of events as inspiration (pull from similar types of events or check these style listings):
 - Timeout This Weekend: https://www.timeout.com/newyork/things-to-do/things-to-do-in-nyc-this-weekend 
