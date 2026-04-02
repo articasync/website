@@ -82,8 +82,33 @@ CRITICAL for "link": Only output real, verified links. Never hallucinate deep li
     
     // Safely parse JSON
     const data = JSON.parse(text);
+    const eventsArray = Array.isArray(data) ? data : [];
 
-    return NextResponse.json(data);
+    // Validate that the link is reachable and the title appears on the page
+    const validatedData = await Promise.all(
+      eventsArray.map(async (item: any) => {
+        if (!item.link) return null;
+        try {
+          const res = await fetch(item.link, { signal: AbortSignal.timeout(5000) }); // 5s timeout
+          if (!res.ok) return null;
+          const html = await res.text();
+          
+          // Flexible whitespace check
+          const escapedTitle = item.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(escapedTitle.split(/\s+/).join('\\s+'), 'i');
+          if (regex.test(html)) {
+            return item;
+          }
+        } catch (e) {
+          // Ignore fetch errors / timeouts
+        }
+        return null;
+      })
+    );
+
+    const filtered = validatedData.filter((item: any) => item !== null);
+
+    return NextResponse.json(filtered);
 
   } catch (e: any) {
     console.error("Gemini Recommendations failed:", e);
