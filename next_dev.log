@@ -7,3 +7,145 @@
 
  ✓ Starting...
  ✓ Ready in 2.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 2.1s (511 modules)
+ GET / 200 in 2223ms
+ ✓ Compiled in 108ms (257 modules)
+ ✓ Compiled in 157ms (257 modules)
+ ✓ Compiled in 138ms (257 modules)
+ ✓ Compiled in 69ms (257 modules)
+ ✓ Compiled in 142ms (257 modules)
+ ✓ Compiled in 137ms (257 modules)
+ ✓ Compiled in 65ms (257 modules)
+ ✓ Compiled in 31ms (243 modules)
+ ✓ Compiled in 66ms (257 modules)
+ ✓ Compiled in 100ms (257 modules)
+ ✓ Compiled in 27ms (243 modules)
+ ✓ Compiled in 92ms (257 modules)
+ ✓ Compiled in 90ms (257 modules)
+ ✓ Compiled in 65ms (257 modules)
+ ✓ Compiled /api/words/seed in 125ms (58 modules)
+ ⨯ PrismaClientInitializationError: 
+Invalid `prisma.dailyWord.deleteMany()` invocation:
+
+
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   | 
+ 6 |   provider  = "postgresql"
+ 7 |   url       = env("DATABASE_URL") // Connection string (used for the app, usually pooled)
+   | 
+
+Validation Error Count: 1
+    at $n.handleRequestError (/Users/ccmueller/Desktop/website/node_modules/@prisma/client/runtime/library.js:121:7615)
+    at $n.handleAndLogRequestError (/Users/ccmueller/Desktop/website/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/ccmueller/Desktop/website/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/Users/ccmueller/Desktop/website/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async POST (webpack-internal:///(rsc)/./app/api/words/seed/route.ts:28:5)
+    at async /Users/ccmueller/Desktop/website/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:53446
+    at async e_.execute (/Users/ccmueller/Desktop/website/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:44747)
+    at async e_.handle (/Users/ccmueller/Desktop/website/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:54700)
+    at async doRender (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:1599:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:1507:28)
+    at async DevServer.renderPageComponent (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/base-server.js:816:17)
+    at async /Users/ccmueller/Desktop/website/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/ccmueller/Desktop/website/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/lib/router-server.js:174:21)
+    at async handleRequest (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/lib/router-server.js:353:24)
+    at async requestHandlerImpl (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/lib/router-server.js:377:13)
+    at async Server.requestListener (/Users/ccmueller/Desktop/website/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  clientVersion: '5.22.0',
+  errorCode: undefined
+}
+ POST /api/words/seed 500 in 441ms
+ ✓ Compiled in 123ms (257 modules)
+ ✓ Compiled in 68ms (257 modules)
+ ✓ Compiled in 70ms (257 modules)
+ ✓ Compiled in 104ms (257 modules)
+ ✓ Compiled in 36ms (243 modules)
+ ✓ Compiled in 94ms (257 modules)
+ ✓ Compiled in 62ms (257 modules)
+ ✓ Compiled in 95ms (257 modules)
+ ✓ Compiled in 67ms (257 modules)
+ ✓ Compiled in 95ms (257 modules)
+ ✓ Compiled in 29ms (243 modules)
+ ✓ Compiled in 92ms (257 modules)
+ ✓ Compiled in 30ms (243 modules)
+ ✓ Compiled /_not-found in 326ms (488 modules)
+ GET /user/login 404 in 416ms
+ GET /user/login 404 in 16ms
+ GET /user/login 404 in 17ms
+ GET /user/login 404 in 35ms
+ GET /user/login 404 in 28ms
+ GET /user/login 404 in 29ms
+ GET /user/login 404 in 24ms
+ GET /user/login 404 in 14ms
+ GET /user/login 404 in 27ms
+ GET /user/login 404 in 28ms
+ GET /user/login 404 in 22ms
+ GET /user/login 404 in 31ms
+ GET /user/login 404 in 21ms
+ ✓ Compiled in 141ms (257 modules)
+ ✓ Compiled in 77ms (257 modules)
+   Reload env: .env
+ ✓ Compiled in 57ms (243 modules)
+   Reload env: .env
+ ✓ Compiled in 39ms (243 modules)
+   Reload env: .env
+ ✓ Compiled in 25ms (243 modules)
+   Reload env: .env
+ ✓ Compiled in 40ms (243 modules)
+   Reload env: .env
+ ✓ Compiled in 40ms (243 modules)
+ ✓ Compiled /_not-found in 175ms (488 modules)
+ GET /user/login 404 in 241ms
+ ✓ Compiled in 260ms (243 modules)
+ ✓ Compiled in 72ms (257 modules)
+ ✓ Compiled in 22ms (243 modules)
+ ✓ Compiled in 64ms (257 modules)
+ ✓ Compiled in 25ms (243 modules)
+ ✓ Compiled in 75ms (257 modules)
+ ✓ Compiled in 22ms (243 modules)
+ ✓ Compiled in 88ms (257 modules)
+ ✓ Compiled in 81ms (257 modules)
+ ✓ Compiled in 105ms (257 modules)
+ ✓ Compiled in 95ms (257 modules)
+ ✓ Compiled in 118ms (257 modules)
+ ✓ Compiled in 80ms (257 modules)
+ ✓ Compiled in 89ms (257 modules)
+ ✓ Compiled in 113ms (257 modules)
+ ✓ Compiled in 117ms (257 modules)
+ ✓ Compiled in 132ms (257 modules)
+ ✓ Compiled in 152ms (257 modules)
+ ✓ Compiled in 114ms (257 modules)
+ ✓ Compiled in 74ms (257 modules)
+ ✓ Compiled in 96ms (257 modules)
+ ✓ Compiled in 159ms (257 modules)
+ ✓ Compiled in 91ms (257 modules)
+ ✓ Compiled in 82ms (257 modules)
+ ✓ Compiled in 93ms (257 modules)
+ ✓ Compiled in 72ms (257 modules)
+ ✓ Compiled in 69ms (257 modules)
+ ✓ Compiled in 95ms (257 modules)
+ ✓ Compiled in 87ms (257 modules)
+ ✓ Compiled in 76ms (257 modules)
+ ✓ Compiled in 158ms (257 modules)
+ ✓ Compiled in 118ms (257 modules)
+ ✓ Compiled in 89ms (257 modules)
+ ✓ Compiled in 118ms (257 modules)
+ ✓ Compiled in 76ms (257 modules)
+ ✓ Compiled in 130ms (257 modules)
+ ✓ Compiled in 88ms (257 modules)
+ ✓ Compiled in 93ms (257 modules)
+ ✓ Compiled in 89ms (257 modules)
+ ✓ Compiled in 117ms (257 modules)
+ ✓ Compiled in 149ms (257 modules)
+ ✓ Compiled /_not-found in 95ms (488 modules)
+ GET /user/login 404 in 154ms
+[?25h

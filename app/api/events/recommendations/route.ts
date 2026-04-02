@@ -68,7 +68,7 @@ CRITICAL for "link": Only output real, verified links. Never hallucinate deep li
 `;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-2.5-flash-lite",
       generationConfig: {
         responseMimeType: "application/json",
       },
