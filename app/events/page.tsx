@@ -18,7 +18,7 @@ interface Interaction {
   description: string;
   time: string;
   link?: string;
-  rating: number;
+  rating?: number;
   reason: string;
   pinned: boolean;
   skipped: boolean;
@@ -30,14 +30,35 @@ export default function EventsPage() {
   const [historyEvents, setHistoryEvents] = useState<Interaction[]>([]);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFields, setEditFields] = useState<{ rating: number; reason: string }>({ rating: 5, reason: "" });
+  const [editFields, setEditFields] = useState<{ reason: string }>({ reason: "" });
   const [guidance, setGuidance] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { rating: number; reason: string } }>({});
+  const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { reason: string } }>({});
 
   useEffect(() => {
-    fetchRecommendations("");
+    const saved = localStorage.getItem("event_recommendations");
+    let loadedFromCache = false;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setRecommendations(parsed);
+          setLoading(false);
+          
+          const inputs: any = {};
+          parsed.forEach((ev: EventRecommendation) => {
+            inputs[ev.id] = { reason: "" };
+          });
+          setRatingInputs(inputs);
+          loadedFromCache = true;
+        }
+      } catch (e) {}
+    }
+    
+    if (!loadedFromCache) {
+      fetchRecommendations("");
+    }
     fetchPinned();
     fetchHistory();
   }, []);
@@ -49,10 +70,11 @@ export default function EventsPage() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setRecommendations(data);
+        localStorage.setItem("event_recommendations", JSON.stringify(data));
         
         const inputs: any = {};
         data.forEach((ev: EventRecommendation) => {
-          inputs[ev.id] = { rating: 5, reason: "" };
+          inputs[ev.id] = { reason: "" };
         });
         setRatingInputs(prev => ({ ...prev, ...inputs }));
       } else {
@@ -130,7 +152,7 @@ export default function EventsPage() {
   };
 
   const handleRateAndReplace = async (eventId: string, isPin: boolean = false, isSkip: boolean = false) => {
-    const input = ratingInputs[eventId] || { rating: 5, reason: "" };
+    const input = ratingInputs[eventId] || { reason: "" };
     const event = recommendations.find(e => e.id === eventId);
     if (!event) return;
 
@@ -144,7 +166,6 @@ export default function EventsPage() {
           description: event.description,
           time: event.time,
           link: event.link,
-          rating: input.rating,
           reason: input.reason,
           pinned: isPin,
           skipped: isSkip,
@@ -164,16 +185,18 @@ export default function EventsPage() {
 
       setRecommendations(prev => {
         const next = prev.filter(e => e.id !== eventId);
+        let updated = next;
         if (replaceData && replaceData.length > 0) {
-          return [...next, replaceData[0]];
+          updated = [...next, replaceData[0]];
         }
-        return next;
+        localStorage.setItem("event_recommendations", JSON.stringify(updated));
+        return updated;
       });
 
       if (replaceData && replaceData.length > 0) {
         setRatingInputs(prev => ({
           ...prev,
-          [replaceData[0].id]: { rating: 5, reason: "" }
+          [replaceData[0].id]: { reason: "" }
         }));
       }
 
@@ -279,21 +302,7 @@ export default function EventsPage() {
 
                   {/* Inputs and Actions in a horizontal flex layout - Shrunk on Desktop, full width on mobile */}
                   <div className="w-full flex md:flex-1 items-center space-x-3">
-                    {/* Rating mini number box */}
-                    <div className="flex items-center space-x-1">
-                      <label className="text-xs font-semibold text-zinc-500">Rate:</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="10"
-                        value={input.rating}
-                        onChange={(e) => setRatingInputs(prev => ({
-                          ...prev,
-                          [event.id]: { ...input, rating: parseInt(e.target.value) }
-                        }))}
-                        className="w-10 text-xs px-1 py-1 rounded-md border border-zinc-200 outline-none"
-                      />
-                    </div>
+
 
                     <input
                       type="text"
@@ -357,14 +366,7 @@ export default function EventsPage() {
                   <div className="flex-1 flex items-center space-x-2">
                     {editingId === h.id ? (
                       <>
-                        <input
-                          type="number"
-                          min="0"
-                          max="10"
-                          value={editFields.rating}
-                          onChange={(e) => setEditFields(p => ({ ...p, rating: parseInt(e.target.value) }))}
-                          className="w-10 text-xs px-1 py-1 rounded-md border border-zinc-200"
-                        />
+
                         <input
                           type="text"
                           value={editFields.reason}
@@ -377,13 +379,12 @@ export default function EventsPage() {
                     ) : (
                       <>
                         <div className="flex-1 flex items-center space-x-2">
-                          <span className="font-bold">[{h.rating ?? 0}/10]:</span>
                           <span className="truncate text-zinc-600 flex-1">{h.reason || "No reason"}</span>
                         </div>
                         <button 
                           onClick={() => {
                             setEditingId(h.id);
-                            setEditFields({ rating: h.rating ?? 5, reason: h.reason || "" });
+                            setEditFields({ reason: h.reason || "" });
                           }} 
                           className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-zinc-700 font-medium rounded-md h-[26px]"
                         >

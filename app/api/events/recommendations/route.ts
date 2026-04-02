@@ -20,9 +20,11 @@ export async function GET(request: Request) {
     const guidance = searchParams.get("guidance") || "";
 
     // 3. Construct prompt context
-    const historyContext = history.map((h: any) => 
-      `- ${h.title} (Rating: ${h.rating ?? "N/A"}, Reason: ${h.reason ?? "N/A"}, Pinned: ${h.pinned}, Skipped: ${h.skipped})`
-    ).join("\n");
+    const pinned = history.filter((h: any) => h.pinned);
+    const skipped = history.filter((h: any) => h.skipped);
+
+    const pinnedContext = pinned.map((h: any) => `- ${h.title} (Reason: ${h.reason ?? "N/A"})`).join("\n");
+    const skippedContext = skipped.map((h: any) => `- ${h.title} (Reason skipped: ${h.reason ?? "N/A"})`).join("\n");
 
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -35,8 +37,16 @@ CRITICAL: Focus on limited-time, unique, pop-up, or special one-off events (like
 Here is the user's general curation guidance:
 "${guidance}"
 
-Here are their past interactions for pattern weights (Exploit what they like and Explore adjacent interests). CRITICAL: Do NOT suggest any event titles that already appear in this history:
-${historyContext}
+Here are the events the user has PINNED (Liked/Interested):
+${pinnedContext}
+
+Here are the events the user has SKIPPED (Avoid/Not interested):
+${skippedContext}
+
+CRITICAL: 
+1. Do NOT suggest any event titles that already appear in the history above.
+2. Analyze the reasons for SKIPPED events. Do NOT recommend events with similar characteristics to those the user skipped, or for similar reasons. Use the reasons as negative signals.
+3. Use the PINNED events to find adjacent interests and exploit what they like.
 
 CRITICAL: Do not recommend events you have already recommended before. Avoid duplicates.
 
