@@ -282,7 +282,7 @@ export default function EventsPage() {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
                 <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto md:h-[60px]">
-                  <div className="flex items-center space-x-3 w-full md:w-[45%]">
+                  <div className="flex items-center space-x-3 w-full md:w-[75%]">
                     {/* Physical Question Mark Target */}
                     <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
                       ?
