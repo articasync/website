@@ -22,9 +22,11 @@ export async function GET(request: Request) {
     // 3. Construct prompt context
     const pinned = history.filter((h: any) => h.pinned);
     const skipped = history.filter((h: any) => h.skipped);
+    const liked = history.filter((h: any) => !h.pinned && !h.skipped);
 
     const pinnedContext = pinned.map((h: any) => `- ${h.title} (Reason: ${h.reason ?? "N/A"})`).join("\n");
     const skippedContext = skipped.map((h: any) => `- ${h.title} (Reason skipped: ${h.reason ?? "N/A"})`).join("\n");
+    const likedContext = liked.map((h: any) => `- ${h.title}`).join("\n");
 
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -37,16 +39,20 @@ CRITICAL: Focus on limited-time, unique, pop-up, or special one-off events (like
 Here is the user's general curation guidance:
 "${guidance}"
 
-Here are the events the user has PINNED (Liked/Interested):
+Here are the events the user has PINNED (They plan to go):
 ${pinnedContext}
 
-Here are the events the user has SKIPPED (Avoid/Not interested):
+Here are the events the user has LIKED (They like the topic/category, but will not go to this specific instance):
+${likedContext}
+
+Here are the events the user has SKIPPED (They do not like these):
 ${skippedContext}
 
 CRITICAL: 
 1. Do NOT suggest any event titles that already appear in the history above.
-2. Analyze the reasons for SKIPPED events. Do NOT recommend events with similar characteristics to those the user skipped, or for similar reasons. Use the reasons as negative signals.
-3. Use the PINNED events to find adjacent interests and exploit what they like.
+2. Analyze the reasons for SKIPPED events. Do NOT recommend events with similar characteristics to those the user skipped. Use them as negative signals.
+3. The LIKED events represent topics the user is interested in. Recommend more events within these topics/categories, but assume they might need different times or settings.
+4. The PINNED events represent exact matches for upcoming visits. Use them to find highly adjacent interests.
 
 CRITICAL: Do not recommend events you have already recommended before. Avoid duplicates.
 

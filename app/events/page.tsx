@@ -304,23 +304,18 @@ export default function EventsPage() {
                   <div className="w-full flex md:flex-1 items-center space-x-3">
 
 
-                    <input
-                      type="text"
-                      placeholder="Reason..."
-                      value={input.reason}
-                      onChange={(e) => setRatingInputs(prev => ({
-                        ...prev,
-                        [event.id]: { ...input, reason: e.target.value }
-                      }))}
-                      className="flex-1 min-w-0 text-xs px-2 py-1 rounded-md border border-zinc-200 outline-none"
-                    />
-
                     <div className="flex space-x-1">
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
                         className="px-2 py-1 bg-zinc-800 hover:bg-zinc-900 text-white font-medium text-xs rounded-md transition-all h-[28px]"
                       >
                         Pin
+                      </button>
+                      <button
+                        onClick={() => handleRateAndReplace(event.id, false, false)}
+                        className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
+                      >
+                        Like
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
@@ -360,44 +355,17 @@ export default function EventsPage() {
                       <p className="text-zinc-500 truncate">{h.time}</p>
                       {h.pinned && <span className="text-emerald-700 font-bold">Pinned</span>}
                       {h.skipped && <span className="text-red-700 font-bold">Skipped</span>}
+                      {!h.pinned && !h.skipped && <span className="text-blue-700 font-bold">Liked</span>}
                     </div>
                   </div>
 
-                  <div className="flex-1 flex items-center space-x-2">
-                    {editingId === h.id ? (
-                      <>
-
-                        <input
-                          type="text"
-                          value={editFields.reason}
-                          onChange={(e) => setEditFields(p => ({ ...p, reason: e.target.value }))}
-                          className="flex-1 text-xs px-2 py-1 rounded-md border border-zinc-200"
-                        />
-                        <button onClick={() => handleEditSave(h.id)} className="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md">Save</button>
-                        <button onClick={() => setEditingId(null)} className="px-2 py-1 bg-gray-200 text-gray-700 rounded-md">X</button>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex-1 flex items-center space-x-2">
-                          <span className="truncate text-zinc-600 flex-1">{h.reason || "No reason"}</span>
-                        </div>
-                        <button 
-                          onClick={() => {
-                            setEditingId(h.id);
-                            setEditFields({ reason: h.reason || "" });
-                          }} 
-                          className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-zinc-700 font-medium rounded-md h-[26px]"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => deleteHistoryItem(h.id)} 
-                          className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-md h-[26px]"
-                        >
-                          Del
-                        </button>
-                      </>
-                    )}
+                  <div className="flex-1 flex justify-end">
+                    <button 
+                      onClick={() => deleteHistoryItem(h.id)} 
+                      className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-md h-[26px]"
+                    >
+                      Del
+                    </button>
                   </div>
                 </div>
               ))
