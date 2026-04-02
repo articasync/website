@@ -32,47 +32,52 @@ export async function GET(request: Request) {
 
     const prompt = `
 Generate ${countToGenerate} event recommendation(s) in New York City. 
-Current Date of Reference: ${today}. You MUST use exact dates for events (e.g. "Tuesday, March 31, 2026") instead of relative terms like "This Tuesday" or "Tomorrow". All recommended events MUST take place on or after this Reference Date. Never recommend events in the past.
 
-CRITICAL: Focus on limited-time, unique, pop-up, or special one-off events (like a guest lecture, a specific concert, or a weekend pop-up art fair). Avoid permanent attractions, long-running static Broadway shows, or standard tourist listings (unless it's an exceptional special engagement). Focus on events that if missed, won't happen again soon!
+CURRENT REFERENCE DATE: ${today}.
+CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
 
-Here is the user's general curation guidance:
-"${guidance}"
+### EVENT CRITERIA:
+1. DATE ACCURACY: All recommended events MUST take place on or after ${today}. Use exact dates (e.g., "Tuesday, March 31, 2026"). 
+2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
+3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
+4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. A deep link leads directly to the specific event/ticket page. NEVER output a homepage (like "theskint.com"). If you cannot find a direct link, do not suggest the event.
 
-Here are the events the user has PINNED (They plan to go):
-${pinnedContext}
+### USER CONTEXT:
+- General Guidance: "${guidance}"
+- PINNED (Planned): ${pinnedContext}
+- LIKED (Interests): ${likedContext}
+- SKIPPED (Avoid): ${skippedContext}
 
-Here are the events the user has LIKED (They like the topic/category, but will not go to this specific instance):
-${likedContext}
+### ANALYSIS RULES:
+- Do NOT suggest any event titles that already appear in the user's history.
+- Analyze SKIPPED events to identify negative signals (e.g., if they skipped a sports event, avoid sports).
+- Use LIKED and PINNED events to find adjacent interests or similar venues.
 
-Here are the events the user has SKIPPED (They do not like these):
-${skippedContext}
+### OUTPUT FORMAT:
+Output as a strict JSON array of objects with these exact keys: 
+"id" (unique string), 
+"title", 
+"description", 
+"time" (Format: 'Weekday, Month Day, Year, Time'), 
+"link" (The verified deep link found via search), 
+"why" (A single sentence explaining why this matches their specific history).
 
-CRITICAL: 
-1. Do NOT suggest any event titles that already appear in the history above.
-2. Analyze the reasons for SKIPPED events. Do NOT recommend events with similar characteristics to those the user skipped. Use them as negative signals.
-3. The LIKED events represent topics the user is interested in. Recommend more events within these topics/categories, but assume they might need different times or settings.
-4. The PINNED events represent exact matches for upcoming visits. Use them to find highly adjacent interests.
-
-CRITICAL: Do not recommend events you have already recommended before. Avoid duplicates.
-
-Consider the following sources of events as inspiration (pull from similar types of events or check these style listings):
-- Timeout This Weekend: https://www.timeout.com/newyork/things-to-do/things-to-do-in-nyc-this-weekend 
-- The Skint: https://www.theskint.com/
-- Secret NYC: https://secretnyc.co/what-to-do-this-weekend-nyc/
-- NYC Resistor Calendar: https://www.nycresistor.com/calendar/
-- Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
-
-Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time" (MUST use strict format: 'Weekday, Month Day, Year, Time' e.g., 'Tuesday, March 31, 2026, 7:00 PM' or 'All Day'), "link", and "why" (a single sentence explaining why you recommended this based on their history or guidance).
-CRITICAL for "link": Only output real, verified DEEP links to the specific event. NEVER just output the main calendar/home URL (like \`https://www.theskint.com/\`). The URL returned must lead directly to the event page and should have some semblance to the title of the event (e.g. contains keywords from the title). If you do not have a specific deep link, do NOT suggest that event. Every suggestion must be backed by a specific event URL.
+CRITICAL: Before finalizing, perform a final search to ensure the links provided do not 404 and the dates are accurate for the year 2026.
 `;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-2.5-flash",
       generationConfig: {
+        // Keep your JSON enforcement here
         responseMimeType: "application/json",
+        temperature: 1.0, // Recommended for better grounding results
       },
-      tools: [{ googleSearchRetrieval: {} }],
+      tools: [
+        {
+          // @ts-expect-error Updated tool name for 2.0+ models
+          googleSearch: {}
+        }
+      ],
     });
 
     const result = await model.generateContent(prompt);
