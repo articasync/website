@@ -158,6 +158,14 @@ export default function EventsPage() {
     toast.success("Applied guidance to current generation!");
   };
 
+  const clearGuidance = () => {
+    setGuidance("");
+    setActiveGuidance("");
+    localStorage.removeItem("active_guidance");
+    fetchRecommendations("");
+    toast.success("Cleared guidance focus!");
+  };
+
   const handleRateAndReplace = async (eventId: string, isPin: boolean = false, isSkip: boolean = false) => {
     const input = ratingInputs[eventId] || { reason: "" };
     const event = recommendations.find(e => e.id === eventId);
@@ -238,6 +246,13 @@ export default function EventsPage() {
             className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs disabled:opacity-50 transition-all font-medium h-[28px]"
           >
             Apply
+          </button>
+          <button
+            onClick={clearGuidance}
+            disabled={submitting}
+            className="px-4 py-1.5 bg-zinc-200 hover:bg-zinc-300 text-zinc-800 font-semibold rounded-md text-xs disabled:opacity-50 transition-all font-medium h-[28px]"
+          >
+            Clear
           </button>
         </div>
       </header>
