@@ -33,11 +33,17 @@ export default function EventsPage() {
   const [editFields, setEditFields] = useState<{ reason: string }>({ reason: "" });
   const [guidance, setGuidance] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [activeGuidance, setActiveGuidance] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { reason: string } }>({});
 
   useEffect(() => {
     const saved = localStorage.getItem("event_recommendations");
+    const savedGuidance = localStorage.getItem("active_guidance") || "";
+    
+    setGuidance(savedGuidance);
+    setActiveGuidance(savedGuidance);
+
     let loadedFromCache = false;
     if (saved) {
       try {
@@ -57,7 +63,7 @@ export default function EventsPage() {
     }
     
     if (!loadedFromCache) {
-      fetchRecommendations("");
+      fetchRecommendations(savedGuidance);
     }
     fetchPinned();
     fetchHistory();
@@ -146,7 +152,8 @@ export default function EventsPage() {
   };
 
   const saveGuidance = () => {
-    // Only apply in current generation (no DB write)
+    setActiveGuidance(guidance);
+    localStorage.setItem("active_guidance", guidance);
     fetchRecommendations(guidance);
     toast.success("Applied guidance to current generation!");
   };
@@ -212,6 +219,9 @@ export default function EventsPage() {
         <div>
           <h1 className="text-xl font-bold tracking-tight">NYC Discovery</h1>
           <p className="text-xs text-zinc-600">Personalized Events.</p>
+          {activeGuidance && (
+            <p className="text-xs text-pink-600 font-medium mt-1">Focus: {activeGuidance}</p>
+          )}
         </div>
         
         <div className="w-full md:flex-1 max-w-lg flex items-center space-x-2">
