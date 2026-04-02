@@ -72,6 +72,7 @@ CRITICAL for "link": Only output real, verified DEEP links to the specific event
       generationConfig: {
         responseMimeType: "application/json",
       },
+      tools: [{ googleSearchRetrieval: {} }],
     });
 
     const result = await model.generateContent(prompt);
