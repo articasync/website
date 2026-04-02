@@ -64,7 +64,7 @@ Consider the following sources of events as inspiration (pull from similar types
 - Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
 
 Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time" (MUST use strict format: 'Weekday, Month Day, Year, Time' e.g., 'Tuesday, March 31, 2026, 7:00 PM' or 'All Day'), "link", and "why" (a single sentence explaining why you recommended this based on their history or guidance).
-CRITICAL for "link": Only output real, verified links. The URL returned should have some semblance to the title of the event (e.g. contains keywords from the title). Never hallucinate deep links that don't exist. If you aren't 100% sure about a specific URI structure, just output the main calendar/home URL for that site from the seed list (e.g. \`https://www.theskint.com/\` or \`https://www.nycresistor.com/calendar/\`).
+CRITICAL for "link": Only output real, verified DEEP links to the specific event. NEVER just output the main calendar/home URL (like \`https://www.theskint.com/\`). The URL returned must lead directly to the event page and should have some semblance to the title of the event (e.g. contains keywords from the title). If you do not have a specific deep link, do NOT suggest that event. Every suggestion must be backed by a specific event URL.
 `;
 
     const model = genAI.getGenerativeModel({
