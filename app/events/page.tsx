@@ -223,36 +223,38 @@ export default function EventsPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-4 font-sans text-sm text-stone-800">
       {/* Soft Neutral Architectural Header & Guidance */}
-      <header className="bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-xl p-4 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 space-x-0 md:space-x-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">NYC Discovery</h1>
-          <p className="text-xs text-zinc-600">Personalized Events.</p>
+      <header className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">NYC Discovery</h1>
+            <p className="text-sm text-zinc-500">Curated cultural events.</p>
+          </div>
+          
           {activeGuidance && (
-            <p className="text-xs text-pink-600 font-medium mt-1">Focus: {activeGuidance}</p>
+            <div className="flex items-center space-x-2 bg-pink-50 border border-pink-100 px-3 py-1.5 rounded-full text-xs font-medium text-pink-700">
+              <span>Focus: {activeGuidance}</span>
+              <button onClick={clearGuidance} className="hover:text-pink-900 font-bold ml-1">✕</button>
+            </div>
           )}
         </div>
-        
-        <div className="w-full md:flex-1 max-w-lg flex items-center space-x-2">
+
+        <div className="flex items-center space-x-2 bg-zinc-50 p-2 rounded-lg border border-zinc-200">
+          <svg className="w-5 h-5 text-zinc-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
             type="text"
             value={guidance}
             onChange={(e) => setGuidance(e.target.value)}
             placeholder="Focus on maker workshops / free music..."
-            className="flex-1 text-xs px-3 py-1.5 rounded-md bg-white text-zinc-900 placeholder-zinc-400 border border-zinc-200 outline-none focus:ring-2 focus:ring-zinc-300"
+            className="flex-1 bg-transparent text-sm text-zinc-800 placeholder-zinc-400 outline-none"
           />
           <button
             onClick={saveGuidance}
             disabled={submitting}
-            className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs disabled:opacity-50 transition-all font-medium h-[28px]"
+            className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs transition-all h-[28px]"
           >
             Apply
-          </button>
-          <button
-            onClick={clearGuidance}
-            disabled={submitting}
-            className="px-4 py-1.5 bg-zinc-200 hover:bg-zinc-300 text-zinc-800 font-semibold rounded-md text-xs disabled:opacity-50 transition-all font-medium h-[28px]"
-          >
-            Clear
           </button>
         </div>
       </header>
