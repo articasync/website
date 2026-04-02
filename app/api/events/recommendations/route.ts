@@ -64,11 +64,11 @@ Consider the following sources of events as inspiration (pull from similar types
 - Simons Foundation Lectures, Thought Gallery, Interintellect, Center for Fiction, Grolier Club.
 
 Output the result as a strict JSON array of objects with these exact keys: "id" (generate a unique string), "title", "description", "time" (MUST use strict format: 'Weekday, Month Day, Year, Time' e.g., 'Tuesday, March 31, 2026, 7:00 PM' or 'All Day'), "link", and "why" (a single sentence explaining why you recommended this based on their history or guidance).
-CRITICAL for "link": Only output real, verified links. Never hallucinate deep links. If you aren't 100% sure about a specific URI structure, just output the main calendar/home URL for that site from the seed list (e.g. \`https://www.theskint.com/\` or \`https://www.nycresistor.com/calendar/\`).
+CRITICAL for "link": Only output real, verified links. The URL returned should have some semblance to the title of the event (e.g. contains keywords from the title). Never hallucinate deep links that don't exist. If you aren't 100% sure about a specific URI structure, just output the main calendar/home URL for that site from the seed list (e.g. \`https://www.theskint.com/\` or \`https://www.nycresistor.com/calendar/\`).
 `;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.1-flash-lite-preview",
       generationConfig: {
         responseMimeType: "application/json",
       },
@@ -84,38 +84,9 @@ CRITICAL for "link": Only output real, verified links. Never hallucinate deep li
     // Safely parse JSON
     const data = JSON.parse(text);
     const eventsArray = Array.isArray(data) ? data : [];
-    console.log(`Received ${eventsArray.length} items from Gemini before validation.`);
+    console.log(`Returning ${eventsArray.length} items from Gemini (Server-side validation bypassed).`);
 
-    // Validate that the link is reachable and the title appears on the page
-    const validatedData = await Promise.all(
-      eventsArray.map(async (item: any) => {
-        if (!item.link) return null;
-        try {
-          console.log(`Starting validation for: ${item.title} at ${item.link}`);
-          const res = await fetch(item.link, { signal: AbortSignal.timeout(5000) }); // 5s timeout
-          console.log(`Verification fetch for ${item.title} (${item.link}) returned status: ${res.status}`);
-          if (!res.ok) return null;
-          const html = await res.text();
-          
-          // Flexible whitespace check
-          const escapedTitle = item.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const regex = new RegExp(escapedTitle.split(/\s+/).join('\\s+'), 'i');
-          if (regex.test(html)) {
-            console.log(`Title Match SUCCESS for: ${item.title}`);
-            return item;
-          } else {
-            console.log(`Title Match FAILED for: ${item.title}`);
-          }
-        } catch (e: any) {
-          console.log(`Validation Error for ${item.link}: ${e.message}`);
-        }
-        return null;
-      })
-    );
-
-    const filtered = validatedData.filter((item: any) => item !== null);
-
-    return NextResponse.json(filtered);
+    return NextResponse.json(eventsArray);
 
   } catch (e: any) {
     console.error("Gemini Recommendations failed:", e);
