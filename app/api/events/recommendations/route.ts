@@ -9,8 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const isSingle = searchParams.get("single") === "true";
-    const countToGenerate = isSingle ? 1 : 5;
+    const countToGenerate = 10; // Batch size of 10 to save API requests
 
     // 1. Fetch past interactions (ratings, pins)
     const history = await prisma.eventInteraction.findMany({

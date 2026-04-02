@@ -35,6 +35,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [activeGuidance, setActiveGuidance] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { reason: string } }>({});
 
   useEffect(() => {
@@ -69,14 +70,23 @@ export default function EventsPage() {
     fetchHistory();
   }, []);
 
-  const fetchRecommendations = async (currentGuidance: string) => {
-    setLoading(true);
+  const fetchRecommendations = async (currentGuidance: string, append: boolean = false) => {
+    if (append && fetchingMore) return;
+    if (append) {
+      setFetchingMore(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const res = await fetch(`/api/events/recommendations?guidance=${encodeURIComponent(currentGuidance)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
-        setRecommendations(data);
-        localStorage.setItem("event_recommendations", JSON.stringify(data));
+        setRecommendations(prev => {
+          const updated = append ? [...prev, ...data] : data;
+          localStorage.setItem("event_recommendations", JSON.stringify(updated));
+          return updated;
+        });
         
         const inputs: any = {};
         data.forEach((ev: EventRecommendation) => {
@@ -89,7 +99,11 @@ export default function EventsPage() {
     } catch (e) {
       toast.error("Failed to fetch recommendations");
     } finally {
-      setLoading(false);
+      if (append) {
+        setFetchingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -154,7 +168,9 @@ export default function EventsPage() {
   const saveGuidance = () => {
     setActiveGuidance(guidance);
     localStorage.setItem("active_guidance", guidance);
-    fetchRecommendations(guidance);
+    setRecommendations([]); // Wipe queue
+    localStorage.removeItem("event_recommendations");
+    fetchRecommendations(guidance, false); // Fetch fresh 10
     toast.success("Applied guidance to current generation!");
   };
 
@@ -162,7 +178,9 @@ export default function EventsPage() {
     setGuidance("");
     setActiveGuidance("");
     localStorage.removeItem("active_guidance");
-    fetchRecommendations("");
+    setRecommendations([]); // Wipe queue
+    localStorage.removeItem("event_recommendations");
+    fetchRecommendations("", false); // Fetch fresh 10
     toast.success("Cleared guidance focus!");
   };
 
@@ -194,25 +212,12 @@ export default function EventsPage() {
       }
       fetchHistory(); // refresh both for live logs updates
 
-      // Fetch a replacement for this specific event
-      const replaceRes = await fetch("/api/events/recommendations?single=true");
-      const replaceData = await replaceRes.json();
+      const next = recommendations.filter(e => e.id !== eventId);
+      setRecommendations(next);
+      localStorage.setItem("event_recommendations", JSON.stringify(next));
 
-      setRecommendations(prev => {
-        const next = prev.filter(e => e.id !== eventId);
-        let updated = next;
-        if (replaceData && replaceData.length > 0) {
-          updated = [...next, replaceData[0]];
-        }
-        localStorage.setItem("event_recommendations", JSON.stringify(updated));
-        return updated;
-      });
-
-      if (replaceData && replaceData.length > 0) {
-        setRatingInputs(prev => ({
-          ...prev,
-          [replaceData[0].id]: { reason: "" }
-        }));
+      if (next.length < 5) {
+        fetchRecommendations(activeGuidance, true); // Append more
       }
 
     } catch (e) {
