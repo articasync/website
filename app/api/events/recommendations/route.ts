@@ -37,7 +37,8 @@ CURRENT REFERENCE DATE: ${today}.
 CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
 
 ### EVENT CRITERIA:
-1. DATE ACCURACY: All recommended events MUST take place on or after ${today}. Use exact dates (e.g., "Tuesday, March 31, 2026"). 
+1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
+   - CRITICAL: You must verify that the search snippet explicitly mentions the correct year. Do not recommend past events or assume an annual event from last year is happening on the same exact day this year.
 2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
 3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
 4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. 
@@ -56,6 +57,7 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 - Do NOT suggest any event titles that already appear in the user's history.
 - Analyze SKIPPED events to identify negative signals.
 - Use LIKED and PINNED events to find adjacent interests or similar venues.
+- Balance relevance with how soon the event is upcoming. Again, only suggest events that are taking place on or after ${today}.
 
 ### OUTPUT FORMAT:
 Output as a strict JSON array of objects with these exact keys: 
@@ -63,9 +65,10 @@ Output as a strict JSON array of objects with these exact keys:
 "title", 
 "description", 
 "time" (Format: 'Weekday, Month Day, Year, Time'), 
-"search_rationale" (Briefly state the exact website/source where you found this event to verify it is real),
-"link" (The exact, unmodified URL from the search result snippet), 
-"why" (A single sentence explaining why this matches their specific history).`;
+"search_rationale" (Briefly state the exact website source AND quote the exact date/year mentioned in the search snippet to prove it is upcoming),
+"link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
+"why" (A single sentence explaining why this matches their specific history).
+`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
