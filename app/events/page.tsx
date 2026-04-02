@@ -301,7 +301,7 @@ export default function EventsPage() {
                   </div>
 
                   {/* Inputs and Actions in a horizontal flex layout - Shrunk on Desktop, full width on mobile */}
-                  <div className="w-full flex md:flex-1 items-center space-x-3">
+                  <div className="w-full flex md:flex-1 items-center justify-end">
 
 
                     <div className="flex space-x-1">
@@ -313,7 +313,7 @@ export default function EventsPage() {
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, false)}
-                        className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
+                        className="px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
                       >
                         Like
                       </button>
@@ -355,7 +355,7 @@ export default function EventsPage() {
                       <p className="text-zinc-500 truncate">{h.time}</p>
                       {h.pinned && <span className="text-emerald-700 font-bold">Pinned</span>}
                       {h.skipped && <span className="text-red-700 font-bold">Skipped</span>}
-                      {!h.pinned && !h.skipped && <span className="text-blue-700 font-bold">Liked</span>}
+                      {!h.pinned && !h.skipped && <span className="text-pink-700 font-bold">Liked</span>}
                     </div>
                   </div>
 
