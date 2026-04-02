@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({});
 
 export async function GET(request: Request) {
   try {
@@ -29,20 +29,21 @@ export async function GET(request: Request) {
 
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    const prompt = `
-Generate ${countToGenerate} event recommendation(s) in New York City. 
+    const systemInstruction = `Return ONLY a valid JSON array. Do not include any introductory text, conversational filler, or Markdown code blocks (like \`\`\`json). Start the response with [ and end it with ].`;
+
+    const prompt = `Generate ${countToGenerate} event recommendation(s) in New York City. 
 
 CURRENT REFERENCE DATE: ${today}.
-CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. 
+CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
 
 ### EVENT CRITERIA:
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}. Use exact dates (e.g., "Tuesday, March 31, 2026"). 
 2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
 3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
-4. LINK INTEGRITY: Every event MUST include a verified DEEP LINK. 
-   - You MUST extract the exact URL string directly from the Google Search results.
-   - NEVER construct, guess, or predict a URL path (e.g., do not guess Eventbrite URL slugs). 
-   - NEVER output a general homepage (like "theskint.com"). 
+4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. 
+   - You MUST extract the exact URL string directly from the Google Search results snippet.
+   - NEVER construct, guess, or predict a URL path (e.g., do not guess Eventbrite URL slugs).
+   - NEVER output a general homepage (like "theskint.com").
    - If the search results do not provide a direct, full URL to the exact event, DO NOT suggest the event.
 
 ### USER CONTEXT:
@@ -54,31 +55,24 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events.
 ### ANALYSIS RULES:
 - Do NOT suggest any event titles that already appear in the user's history.
 - Analyze SKIPPED events to identify negative signals.
-- Use LIKED and PINNED events to find adjacent interests.
-`;
+- Use LIKED and PINNED events to find adjacent interests or similar venues.
+
+### OUTPUT FORMAT:
+Output as a strict JSON array of objects with these exact keys: 
+"id" (unique string), 
+"title", 
+"description", 
+"time" (Format: 'Weekday, Month Day, Year, Time'), 
+"search_rationale" (Briefly state the exact website/source where you found this event to verify it is real),
+"link" (The exact, unmodified URL from the search result snippet), 
+"why" (A single sentence explaining why this matches their specific history).`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
+        systemInstruction: systemInstruction,
         temperature: 0.2, // LOWERED: crucial for exact URL strings
-        responseMimeType: "application/json", // Native JSON mode
-        responseSchema: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              id: { type: "STRING", description: "Unique string ID" },
-              title: { type: "STRING" },
-              description: { type: "STRING" },
-              time: { type: "STRING", description: "Format: Weekday, Month Day, Year, Time" },
-              search_rationale: { type: "STRING", description: "Briefly state the exact website/source where you found this event to verify it is real." },
-              link: { type: "STRING", description: "The exact, unmodified URL from the search result snippet. Do not guess or construct URLs." },
-              why: { type: "STRING", description: "One sentence explaining why this matches their history." }
-            },
-            required: ["id", "title", "description", "time", "search_rationale", "link", "why"]
-          }
-        },
         tools: [
           {
             googleSearch: {}
@@ -88,12 +82,18 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events.
     });
 
     let text = response.text || "";
-    if (typeof text !== "string") {
+    
+    // Safety check: Strip markdown code blocks if the model ignored the "no-markdown" rule
+    if (typeof text === "string") {
+      if (text.startsWith('```json')) {
+        text = text.replace(/^```json\n/, '').replace(/\n```$/, '');
+      } else if (text.startsWith('```')) {
+        text = text.replace(/^```\n/, '').replace(/\n```$/, '');
+      }
+      text = text.trim();
+    } else {
       text = JSON.stringify(text); // Fallback if it's already an object
     }
-    
-    // Strip markdown code blocks if generated by Gemini
-    text = text.replace(/```json|```/g, "").trim();
     console.log("Raw Gemini Text:", text);
     
     let eventsArray: any[] = [];
