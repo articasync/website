@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -30,20 +30,20 @@ export async function GET(request: Request) {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     const prompt = `
-### SYSTEM INSTRUCTION:
-Return ONLY a valid JSON array. Do not include any introductory text, conversational filler, or Markdown code blocks (like json). Start the response with [ and end it with ].
-
-### PROMPT:
 Generate ${countToGenerate} event recommendation(s) in New York City. 
 
 CURRENT REFERENCE DATE: ${today}.
-CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
+CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. 
 
 ### EVENT CRITERIA:
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}. Use exact dates (e.g., "Tuesday, March 31, 2026"). 
 2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
 3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
-4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. A deep link leads directly to the specific event/ticket page. NEVER output a homepage (like "theskint.com"). If you cannot find a direct link, do not suggest the event.
+4. LINK INTEGRITY: Every event MUST include a verified DEEP LINK. 
+   - You MUST extract the exact URL string directly from the Google Search results.
+   - NEVER construct, guess, or predict a URL path (e.g., do not guess Eventbrite URL slugs). 
+   - NEVER output a general homepage (like "theskint.com"). 
+   - If the search results do not provide a direct, full URL to the exact event, DO NOT suggest the event.
 
 ### USER CONTEXT:
 - General Guidance: "${guidance}"
@@ -53,25 +53,31 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 
 ### ANALYSIS RULES:
 - Do NOT suggest any event titles that already appear in the user's history.
-- Analyze SKIPPED events to identify negative signals (e.g., if they skipped a sports event, avoid sports).
-- Use LIKED and PINNED events to find adjacent interests or similar venues.
-
-### OUTPUT FORMAT:
-Output as a strict JSON array of objects with these exact keys: 
-"id" (unique string), 
-"title", 
-"description", 
-"time" (Format: 'Weekday, Month Day, Year, Time'), 
-"link" (The verified deep link found via search), 
-"why" (A single sentence explaining why this matches their specific history).
-
-CRITICAL: Before finalizing, perform a final search to ensure the links provided do not 404 and the dates are accurate for the year 2026.
+- Analyze SKIPPED events to identify negative signals.
+- Use LIKED and PINNED events to find adjacent interests.
 `;
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
       generationConfig: {
-        temperature: 1.0, // Recommended for better grounding results
+        temperature: 0.2, // LOWERED: crucial for exact URL strings
+        responseMimeType: "application/json", // Native JSON mode
+        responseSchema: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              id: { type: SchemaType.STRING, description: "Unique string ID" },
+              title: { type: SchemaType.STRING },
+              description: { type: SchemaType.STRING },
+              time: { type: SchemaType.STRING, description: "Format: Weekday, Month Day, Year, Time" },
+              search_rationale: { type: SchemaType.STRING, description: "Briefly state the exact website/source where you found this event to verify it is real." },
+              link: { type: SchemaType.STRING, description: "The exact, unmodified URL from the search result snippet. Do not guess or construct URLs." },
+              why: { type: SchemaType.STRING, description: "One sentence explaining why this matches their history." }
+            },
+            required: ["id", "title", "description", "time", "search_rationale", "link", "why"]
+          }
+        }
       },
       tools: [
         {
