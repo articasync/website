@@ -352,6 +352,12 @@ export default function EventsPage() {
                         Pin
                       </button>
                       <button
+                        onClick={() => handleRateAndReplace(event.id, false, false)}
+                        className="px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
+                      >
+                        Like
+                      </button>
+                      <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
                         className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-xs rounded-md transition-all h-[28px]"
                       >
