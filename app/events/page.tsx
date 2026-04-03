@@ -331,7 +331,7 @@ export default function EventsPage() {
                           <a href={event.link} target="_blank" rel="noopener noreferrer" className="font-bold text-zinc-900 hover:underline">Link</a>
                         )}
                       </div>
-                      <div className="mt-1 text-xs text-zinc-600 columns-1 sm:columns-2 gap-2">
+                      <div className="mt-1 text-xs text-zinc-600">
                         {event.description}
                       </div>
                     </div>
