@@ -335,8 +335,14 @@ export default function EventsPage() {
                   </div>
 
                   {/* Inputs and Actions in a horizontal flex layout - Shrunk on Desktop, full width on mobile */}
-                  <div className="w-full flex md:flex-1 items-center justify-end">
-
+                  <div className="w-full flex md:flex-1 items-center justify-end space-x-1">
+                    <input
+                      type="text"
+                      placeholder="Why pin/skip?"
+                      value={ratingInputs[event.id]?.reason || ""}
+                      onChange={(e) => setRatingInputs(prev => ({ ...prev, [event.id]: { reason: e.target.value } }))}
+                      className="px-2 py-1 text-xs border border-zinc-200 rounded-md outline-none focus:border-zinc-500 w-[120px] h-[28px]"
+                    />
 
                     <div className="flex space-x-1">
                       <button
@@ -344,12 +350,6 @@ export default function EventsPage() {
                         className="px-2 py-1 bg-zinc-800 hover:bg-zinc-900 text-white font-medium text-xs rounded-md transition-all h-[28px]"
                       >
                         Pin
-                      </button>
-                      <button
-                        onClick={() => handleRateAndReplace(event.id, false, false)}
-                        className="px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
-                      >
-                        Like
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
