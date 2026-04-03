@@ -216,8 +216,8 @@ export default function EventsPage() {
       setRecommendations(next);
       localStorage.setItem("event_recommendations", JSON.stringify(next));
 
-      if (next.length < 5) {
-        fetchRecommendations(activeGuidance, true); // Append more
+      if (next.length === 0) {
+        fetchRecommendations(activeGuidance, true); // Append more when queue is empty
       }
 
     } catch (e) {
