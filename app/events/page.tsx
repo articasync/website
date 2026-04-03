@@ -341,7 +341,7 @@ export default function EventsPage() {
                       placeholder="Why pin/skip?"
                       value={ratingInputs[event.id]?.reason || ""}
                       onChange={(e) => setRatingInputs(prev => ({ ...prev, [event.id]: { reason: e.target.value } }))}
-                      className="px-2 py-1 text-xs border border-zinc-200 rounded-md outline-none focus:border-zinc-500 w-[120px] h-[28px]"
+                      className="px-2 py-1 text-xs border border-zinc-200 rounded-md outline-none focus:border-zinc-500 w-[240px] h-[28px]"
                     />
 
                     <div className="flex space-x-1">
