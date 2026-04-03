@@ -53,6 +53,12 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 - LIKED (Interests): ${likedContext}
 - SKIPPED (Avoid): ${skippedContext}
 
+### USER COMPREHENSION STEP:
+Before generating recommendations, analyze the user's history below. 
+- Identify clear patterns (e.g., does the user prefer indoor vs outdoor events? Live music vs comedy? Specific neighborhoods vs general NYC?).
+- Determine what venues and types of events they explicitly SKIPPED.
+- Use this mental profile to give more targeted guidance and avoid past failures, but still leave 20% room for exploration to keep things fresh.
+
 ### ANALYSIS RULES:
 - Do NOT suggest any event titles that already appear in the user's history.
 - Analyze SKIPPED events to identify negative signals.
@@ -67,7 +73,7 @@ Output as a strict JSON array of objects with these exact keys:
 "time" (Format: 'Weekday, Month Day, Year, Time'), 
 "search_rationale" (Briefly state the exact website source AND quote the exact date/year mentioned in the search snippet to prove it is upcoming),
 "link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
-"why" (A single sentence explaining why this matches their specific history).
+"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their likes/skips and explaining why it fits and was selected for them).
 `;
 
     const response = await ai.models.generateContent({

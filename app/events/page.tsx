@@ -322,7 +322,9 @@ export default function EventsPage() {
 
                     {/* Event Info (Title & Link) - Wider on desktop */}
                     <div className="min-w-0 pr-2 flex flex-col justify-center flex-1 truncate">
-                      <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800">{event.title}</h3>
+                      <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800 cursor-help" title={event.description}>
+                        {event.title}
+                      </h3>
                       <div className="flex items-center space-x-2 text-xs truncate">
                         <p className="text-zinc-500 truncate">{event.time}</p>
                         {event.link && (
