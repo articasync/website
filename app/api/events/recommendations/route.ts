@@ -40,6 +40,7 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
    - CRITICAL: You must verify that the search snippet explicitly mentions the correct year. Do not recommend past events or assume an annual event from last year is happening on the same exact day this year.
 2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
+   - DESCRIPTION: Provide an elaborately detailed description (roughly 100-150 words) that explains what is happening and why it is interesting.
 3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
 4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. 
    - You MUST extract the exact URL string directly from the Google Search results snippet.

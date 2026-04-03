@@ -313,7 +313,7 @@ export default function EventsPage() {
             {recommendations.map((event) => {
               const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
-                <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto md:h-[60px]">
+                <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto">
                   <div className="flex items-center space-x-3 w-full md:w-[75%]">
                     {/* Physical Question Mark Target */}
                     <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
@@ -321,7 +321,7 @@ export default function EventsPage() {
                     </div>
 
                     {/* Event Info (Title & Link) - Wider on desktop */}
-                    <div className="min-w-0 pr-2 flex flex-col justify-center flex-1 truncate">
+                    <div className="min-w-0 pr-2 flex flex-col justify-center flex-1">
                       <h3 className="font-bold text-zinc-900 truncate hover:text-zinc-800 cursor-help" title={event.description}>
                         {event.title}
                       </h3>
@@ -330,6 +330,9 @@ export default function EventsPage() {
                         {event.link && (
                           <a href={event.link} target="_blank" rel="noopener noreferrer" className="font-bold text-zinc-900 hover:underline">Link</a>
                         )}
+                      </div>
+                      <div className="mt-1 text-xs text-zinc-600 columns-1 sm:columns-2 gap-2">
+                        {event.description}
                       </div>
                     </div>
                   </div>
