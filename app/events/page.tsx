@@ -463,7 +463,7 @@ export default function EventsPage() {
             {fetchingMore && (
               <div className="flex items-center justify-center p-2 bg-white rounded-lg border border-zinc-100 h-[60px]">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-zinc-800"></div>
-                <span className="ml-2 text-xs text-zinc-500">Pulling next 10 events...</span>
+                <span className="ml-2 text-xs text-zinc-500">Pulling next 5 events...</span>
               </div>
             )}
           </div>

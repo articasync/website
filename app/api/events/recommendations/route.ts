@@ -10,7 +10,7 @@ const ai = new GoogleGenAI({});
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const countToGenerate = 10; // Batch size of 10 to save API requests
+    const countToGenerate = 5; // Batch size of 5 to make response much faster and avoid timeouts
 
     // 1. Fetch past interactions (ratings, pins)
     const history = await prisma.eventInteraction.findMany({
@@ -71,7 +71,7 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
    - CRITICAL: You must verify that the search snippet explicitly mentions the correct year. Do not recommend past events or assume an annual event from last year is happening on the same exact day this year.
 2. UNIQUENESS: Focus on limited-time, unique, pop-up, or one-off events (guest lectures, concerts, weekend fairs). 
-   - DESCRIPTION: Provide an elaborately detailed description (roughly 100-150 words) that explains what is happening and why it is interesting.
+   - DESCRIPTION: Provide a concise yet detailed description (roughly 40-60 words) that explains what is happening and why it is interesting.
 3. EXCLUSIONS: Avoid permanent attractions, long-running Broadway shows, or standard tourist traps.
 4. LINK INTEGRITY: Every event MUST have a verified DEEP LINK. 
    - You MUST extract the exact URL string directly from the Google Search results snippet.
@@ -111,7 +111,7 @@ Output as a strict JSON array of objects with these exact keys:
 "time" (Format: 'Weekday, Month Day, Year, Time'), 
 "search_rationale" (Briefly state the exact website source AND quote the exact date/year mentioned in the search snippet to prove it is upcoming),
 "link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
-"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them),
+"why" (Provide a brief 1-sentence explanation of why this aligns with their profile),
 "spotify_artist_id" (string or null),
 "music_artist" (string or null),
 "expected_price" (Estimate the ticket price. When you do not know the price, say "$Unknown". If it varies, try to specify a range like "$20-$40". Otherwise, set to "Free" or a specific amount like "$20" based on search snippets or reasonable predictions. Keep it short and clear.),
