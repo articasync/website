@@ -12,6 +12,7 @@ interface EventRecommendation {
   link?: string;
   spotifyArtistId?: string | null;
   musicArtist?: string | null;
+  expectedPrice?: string | null;
 }
 
 interface Interaction {
@@ -26,6 +27,7 @@ interface Interaction {
   skipped: boolean;
   spotifyArtistId?: string | null;
   musicArtist?: string | null;
+  expectedPrice?: string | null;
 }
 
 const SpotifyIcon = () => (
@@ -229,6 +231,7 @@ export default function EventsPage() {
           skipped: isSkip,
           spotifyArtistId: event.spotifyArtistId,
           musicArtist: event.musicArtist,
+          expectedPrice: event.expectedPrice,
         }),
       });
 
@@ -328,20 +331,31 @@ export default function EventsPage() {
                   </div>
                   <p className="text-slate-500 text-[10px] font-medium truncate">{event.time}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  {event.link && (
-                    <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-800 hover:underline inline-block font-medium">Link</a>
-                  )}
-                  {event.musicArtist && (
-                    <a
-                      href={`https://open.spotify.com/search/${encodeURIComponent(event.musicArtist)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
-                    >
-                      <SpotifyIcon />
-                      Listen
-                    </a>
+                <div className="flex items-center gap-2 justify-between mt-auto">
+                  <div className="flex items-center gap-2">
+                    {event.link && (
+                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-800 hover:underline inline-block font-medium">Link</a>
+                    )}
+                    {event.musicArtist && (
+                      <a
+                        href={`https://open.spotify.com/search/${encodeURIComponent(event.musicArtist)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                      >
+                        <SpotifyIcon />
+                        Listen
+                      </a>
+                    )}
+                  </div>
+                  {event.expectedPrice && (
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold border ${
+                      event.expectedPrice.toLowerCase().includes("free") 
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                        : "bg-zinc-50 text-zinc-600 border-zinc-200"
+                    }`}>
+                      {event.expectedPrice}
+                    </span>
                   )}
                 </div>
               </div>
@@ -391,6 +405,15 @@ export default function EventsPage() {
                             <SpotifyIcon />
                             Listen
                           </a>
+                        )}
+                        {event.expectedPrice && (
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold border ${
+                            event.expectedPrice.toLowerCase().includes("free") 
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                              : "bg-zinc-100 text-zinc-800 border-zinc-200"
+                          }`}>
+                            {event.expectedPrice}
+                          </span>
                         )}
                       </div>
                       <div className="mt-1 text-xs text-zinc-600">

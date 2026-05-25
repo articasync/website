@@ -113,7 +113,8 @@ Output as a strict JSON array of objects with these exact keys:
 "link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
 "why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them),
 "spotify_artist_id" (string or null),
-"music_artist" (string or null)
+"music_artist" (string or null),
+"expected_price" (Estimate the ticket price. When you do not know the price, say "$Unknown". If it varies, try to specify a range like "$20-$40". Otherwise, set to "Free" or a specific amount like "$20" based on search snippets or reasonable predictions. Keep it short and clear.)
 `;
 
     const response = await ai.models.generateContent({
@@ -163,6 +164,7 @@ Output as a strict JSON array of objects with these exact keys:
       searchRationale: event.search_rationale,
       spotifyArtistId: event.spotify_artist_id || null,
       musicArtist: event.music_artist || null,
+      expectedPrice: event.expected_price || null,
     }));
 
     console.log(`Returning ${formattedEvents.length} items from Gemini (Server-side validation bypassed).`);

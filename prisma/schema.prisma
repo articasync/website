@@ -70,6 +70,7 @@ model EventInteraction {
   skipped     Boolean  @default(false)
   spotifyArtistId String?
   musicArtist     String?
+  expectedPrice   String?
   createdAt   DateTime @default(now())
 }
 
