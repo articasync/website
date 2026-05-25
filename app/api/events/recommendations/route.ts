@@ -96,14 +96,12 @@ Before generating recommendations, analyze the user's history below.
 - Use PINNED events to find adjacent interests or similar venues.
 - Balance relevance with how soon the event is upcoming. Again, only suggest events that are taking place on or after ${today}.
 
-### MUSIC RECOMMENDATION & SPOTIFY LOOKUP:
+### MUSIC RECOMMENDATION & ARTIST IDENTIFICATION:
 If the event is a concert, DJ set, live music show, performance, party, club night, or features a clear musical artist / DJ:
 - Identify the primary performing musical artist or DJ.
-- Use the Google Search tool to search for the artist's Spotify page URL. Formulate a search query like: "[Artist Name] site:open.spotify.com/artist/".
-- Locate the 22-character alphanumeric Spotify Artist ID from the search result URL (e.g., in "https://open.spotify.com/artist/4tZ59HO1h3wVx6H4TMotpq", the ID is "4tZ59HO1h3wVx6H4TMotpq").
-- Set "spotify_artist_id" to this 22-character ID. Make sure it is exactly the 22-character base62 string, not the full URL.
-- Set "music_artist" to the name of the main performing artist or DJ.
-- CRITICAL FOR TIMEOUTS: If the event is NOT music-related, or if you cannot find a valid 22-character Spotify Artist ID in a single simple search, immediately set BOTH "spotify_artist_id" and "music_artist" to null. Do NOT make multiple query attempts.
+- Set "music_artist" to the clean, plain name of the main performing artist or DJ (e.g. "Dead Prez").
+- Set "spotify_artist_id" to null.
+- If the event is NOT music-related, set BOTH "spotify_artist_id" and "music_artist" to null.
 
 ### OUTPUT FORMAT:
 Output as a strict JSON array of objects with these exact keys: 
