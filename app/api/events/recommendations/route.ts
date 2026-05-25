@@ -34,6 +34,16 @@ export async function GET(request: Request) {
 CURRENT REFERENCE DATE: ${today}.
 CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
 
+### PREFERRED TARGET SOURCES & NYC VENUES:
+1. SEARCH PLATFORMS: Actively look for upcoming concerts, underground shows, and music events on:
+   - Resident Advisor (residentadvisor.net)
+   - Bandcamp (bandcamp.com)
+   - EDMTrain (edmtrain.com)
+2. SPECIFIC NYC VENUES: Actively check and search calendars for real local venues, such as:
+   - Brooklyn Steel, Elsewhere, Avant Gardner / The Brooklyn Mirage, Knockdown Center
+   - Webster Hall, Bowery Ballroom, Music Hall of Williamsburg, TV Eye, Baby's All Right, Pioneer Works, Union Pool, etc.
+   Formulate targeted Google Search queries using these platforms and venues to retrieve accurate real-time listings.
+
 ### EVENT CRITERIA:
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
    - CRITICAL: You must verify that the search snippet explicitly mentions the correct year. Do not recommend past events or assume an annual event from last year is happening on the same exact day this year.
