@@ -21,11 +21,9 @@ export async function GET(request: Request) {
     // 3. Construct prompt context
     const pinned = history.filter((h: any) => h.pinned);
     const skipped = history.filter((h: any) => h.skipped);
-    const liked = history.filter((h: any) => !h.pinned && !h.skipped);
 
     const pinnedContext = pinned.map((h: any) => `- ${h.title} (Reason: ${h.reason ?? "N/A"})`).join("\n");
     const skippedContext = skipped.map((h: any) => `- ${h.title} (Reason skipped: ${h.reason ?? "N/A"})`).join("\n");
-    const likedContext = liked.map((h: any) => `- ${h.title}`).join("\n");
 
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -51,7 +49,6 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 ### USER CONTEXT:
 - General Guidance: "${guidance}"
 - PINNED (Planned): ${pinnedContext}
-- LIKED (Interests): ${likedContext}
 - SKIPPED (Avoid): ${skippedContext}
 
 ### USER COMPREHENSION STEP:
@@ -63,7 +60,7 @@ Before generating recommendations, analyze the user's history below.
 ### ANALYSIS RULES:
 - Do NOT suggest any event titles that already appear in the user's history.
 - Analyze SKIPPED events to identify negative signals.
-- Use LIKED and PINNED events to find adjacent interests or similar venues.
+- Use PINNED events to find adjacent interests or similar venues.
 - Balance relevance with how soon the event is upcoming. Again, only suggest events that are taking place on or after ${today}.
 
 ### OUTPUT FORMAT:
@@ -74,7 +71,7 @@ Output as a strict JSON array of objects with these exact keys:
 "time" (Format: 'Weekday, Month Day, Year, Time'), 
 "search_rationale" (Briefly state the exact website source AND quote the exact date/year mentioned in the search snippet to prove it is upcoming),
 "link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
-"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their likes/skips and explaining why it fits and was selected for them).
+"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them).
 `;
 
     const response = await ai.models.generateContent({

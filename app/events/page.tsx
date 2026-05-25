@@ -205,7 +205,7 @@ export default function EventsPage() {
         }),
       });
 
-      toast.success(isSkip ? "Skipped!" : isPin ? "Pinned to upcoming!" : "Rated!");
+      toast.success(isSkip ? "Skipped!" : "Pinned to upcoming!");
 
       if (isPin) {
         fetchPinned(); // refresh pins if it was pinned
@@ -355,12 +355,6 @@ export default function EventsPage() {
                         Pin
                       </button>
                       <button
-                        onClick={() => handleRateAndReplace(event.id, false, false)}
-                        className="px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs rounded-md transition-all h-[28px]"
-                      >
-                        Like
-                      </button>
-                      <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
                         className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-xs rounded-md transition-all h-[28px]"
                       >
@@ -404,7 +398,6 @@ export default function EventsPage() {
                       <p className="text-zinc-500 truncate">{h.time}</p>
                       {h.pinned && <span className="text-emerald-700 font-bold">Pinned</span>}
                       {h.skipped && <span className="text-red-700 font-bold">Skipped</span>}
-                      {!h.pinned && !h.skipped && <span className="text-pink-700 font-bold">Liked</span>}
                     </div>
                   </div>
 
