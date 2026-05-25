@@ -59,15 +59,17 @@ model DailyWord {
 }
 
 model EventInteraction {
-  id          String   @id @default(cuid())
-  title        String
-  description String
-  time        String?
-  link        String?
-  rating      Int?     // 0-10
-  reason      String?
-  pinned      Boolean  @default(false)
-  skipped     Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  time            String?
+  link            String?
+  rating          Int?     // 0-10
+  reason          String?
+  pinned          Boolean  @default(false)
+  skipped         Boolean  @default(false)
+  spotifyArtistId String?
+  musicArtist     String?
+  createdAt       DateTime @default(now())
 }
 
