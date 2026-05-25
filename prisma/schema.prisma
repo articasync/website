@@ -75,3 +75,10 @@ model EventInteraction {
   createdAt   DateTime @default(now())
 }
 
+model SpotifyArtistCache {
+  id          String   @id @default(cuid())
+  artistName  String   @unique
+  spotifyUrl  String?
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
