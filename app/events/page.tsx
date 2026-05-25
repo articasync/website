@@ -36,6 +36,7 @@ export default function EventsPage() {
   const [activeGuidance, setActiveGuidance] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
+  const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
 
   useEffect(() => {
     // Clean up legacy cache key if it exists
@@ -69,7 +70,7 @@ export default function EventsPage() {
     fetchHistory();
   }, []);
 
-  const fetchRecommendations = async (currentGuidance: string, append: boolean = false) => {
+  const fetchRecommendations = async (currentGuidance: string, append: boolean = false, titlesToExclude: string[] = []) => {
     if (append && fetchingMore) return;
     if (append) {
       setFetchingMore(true);
@@ -78,7 +79,11 @@ export default function EventsPage() {
     }
 
     try {
-      const res = await fetch(`/api/events/recommendations?guidance=${encodeURIComponent(currentGuidance)}`);
+      const excludeParam = titlesToExclude.length > 0 ? `&exclude=${encodeURIComponent(JSON.stringify(titlesToExclude))}` : "";
+      const res = await fetch(
+        `/api/events/recommendations?guidance=${encodeURIComponent(currentGuidance)}${excludeParam}&t=${Date.now()}`,
+        { cache: "no-store" }
+      );
       const data = await res.json();
       if (Array.isArray(data)) {
         setRecommendations(prev => {
@@ -162,8 +167,9 @@ export default function EventsPage() {
     setActiveGuidance(guidance);
     localStorage.setItem("active_guidance", guidance);
     setRecommendations([]); // Wipe queue
+    setExcludeTitles([]); // Reset exclusions for new focus
     localStorage.removeItem("event_recommendations_v2");
-    fetchRecommendations(guidance, false); // Fetch fresh 10
+    fetchRecommendations(guidance, false, []); // Fetch fresh 10 with empty exclusions
     toast.success("Applied guidance to current generation!");
   };
 
@@ -172,15 +178,20 @@ export default function EventsPage() {
     setActiveGuidance("");
     localStorage.removeItem("active_guidance");
     setRecommendations([]); // Wipe queue
+    setExcludeTitles([]); // Reset exclusions
     localStorage.removeItem("event_recommendations_v2");
-    fetchRecommendations("", false); // Fetch fresh 10
+    fetchRecommendations("", false, []); // Fetch fresh 10 with empty exclusions
     toast.success("Cleared guidance focus!");
   };
 
   const handleRefreshQueue = () => {
+    const currentTitles = recommendations.map(e => e.title);
+    const newExclude = [...excludeTitles, ...currentTitles];
+    setExcludeTitles(newExclude);
+
     setRecommendations([]);
     localStorage.removeItem("event_recommendations_v2");
-    fetchRecommendations(activeGuidance, false);
+    fetchRecommendations(activeGuidance, false, newExclude);
     toast.success("Queue reset! Fetching fresh recommendations...");
   };
 
@@ -216,7 +227,7 @@ export default function EventsPage() {
       localStorage.setItem("event_recommendations_v2", JSON.stringify(next));
 
       if (next.length === 0) {
-        fetchRecommendations(activeGuidance, true); // Append more when queue is empty
+        fetchRecommendations(activeGuidance, true, excludeTitles); // Append more when queue is empty using active exclusions
       }
 
     } catch (e) {

@@ -17,6 +17,15 @@ export async function GET(request: Request) {
     });
 
     const guidance = searchParams.get("guidance") || "";
+    const excludeParam = searchParams.get("exclude") || "";
+    let excludeList: string[] = [];
+    if (excludeParam) {
+      try {
+        excludeList = JSON.parse(excludeParam);
+      } catch (e) {
+        excludeList = excludeParam.split(",").map(t => t.trim()).filter(Boolean);
+      }
+    }
 
     // 3. Construct prompt context
     const pinned = history.filter((h: any) => h.pinned);
@@ -24,6 +33,10 @@ export async function GET(request: Request) {
 
     const pinnedContext = pinned.map((h: any) => `- ${h.title} (Reason: ${h.reason ?? "N/A"})`).join("\n");
     const skippedContext = skipped.map((h: any) => `- ${h.title} (Reason skipped: ${h.reason ?? "N/A"})`).join("\n");
+
+    const excludeContext = excludeList.length > 0
+      ? `\n- ADDITIONAL EXCLUDED EVENT TITLES (Do NOT recommend these under any circumstances): ${excludeList.map((t: string) => `"${t}"`).join(", ")}`
+      : "";
 
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -68,7 +81,7 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
 ### USER CONTEXT:
 - General Guidance: "${guidance}"
 - PINNED (Planned): ${pinnedContext}
-- SKIPPED (Avoid): ${skippedContext}
+- SKIPPED (Avoid): ${skippedContext}${excludeContext}
 
 ### USER COMPREHENSION STEP:
 Before generating recommendations, analyze the user's history below. 
@@ -77,7 +90,7 @@ Before generating recommendations, analyze the user's history below.
 - Use this mental profile to give more targeted guidance and avoid past failures, but still leave 20% room for exploration to keep things fresh.
 
 ### ANALYSIS RULES:
-- Do NOT suggest any event titles that already appear in the user's history.
+- Do NOT suggest any event titles that already appear in the user's history or in the ADDITIONAL EXCLUDED EVENT TITLES list.
 - Analyze SKIPPED events to identify negative signals.
 - Use PINNED events to find adjacent interests or similar venues.
 - Balance relevance with how soon the event is upcoming. Again, only suggest events that are taking place on or after ${today}.
