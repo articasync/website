@@ -38,7 +38,12 @@ export default function EventsPage() {
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("event_recommendations");
+    // Clean up legacy cache key if it exists
+    if (localStorage.getItem("event_recommendations")) {
+      localStorage.removeItem("event_recommendations");
+    }
+
+    const saved = localStorage.getItem("event_recommendations_v2");
     const savedGuidance = localStorage.getItem("active_guidance") || "";
     
     setGuidance(savedGuidance);
@@ -78,7 +83,7 @@ export default function EventsPage() {
       if (Array.isArray(data)) {
         setRecommendations(prev => {
           const updated = append ? [...prev, ...data] : data;
-          localStorage.setItem("event_recommendations", JSON.stringify(updated));
+          localStorage.setItem("event_recommendations_v2", JSON.stringify(updated));
           return updated;
         });
       } else {
@@ -157,7 +162,7 @@ export default function EventsPage() {
     setActiveGuidance(guidance);
     localStorage.setItem("active_guidance", guidance);
     setRecommendations([]); // Wipe queue
-    localStorage.removeItem("event_recommendations");
+    localStorage.removeItem("event_recommendations_v2");
     fetchRecommendations(guidance, false); // Fetch fresh 10
     toast.success("Applied guidance to current generation!");
   };
@@ -167,9 +172,16 @@ export default function EventsPage() {
     setActiveGuidance("");
     localStorage.removeItem("active_guidance");
     setRecommendations([]); // Wipe queue
-    localStorage.removeItem("event_recommendations");
+    localStorage.removeItem("event_recommendations_v2");
     fetchRecommendations("", false); // Fetch fresh 10
     toast.success("Cleared guidance focus!");
+  };
+
+  const handleRefreshQueue = () => {
+    setRecommendations([]);
+    localStorage.removeItem("event_recommendations_v2");
+    fetchRecommendations(activeGuidance, false);
+    toast.success("Queue reset! Fetching fresh recommendations...");
   };
 
   const handleRateAndReplace = async (eventId: string, isPin: boolean = false, isSkip: boolean = false) => {
@@ -201,7 +213,7 @@ export default function EventsPage() {
 
       const next = recommendations.filter(e => e.id !== eventId);
       setRecommendations(next);
-      localStorage.setItem("event_recommendations", JSON.stringify(next));
+      localStorage.setItem("event_recommendations_v2", JSON.stringify(next));
 
       if (next.length === 0) {
         fetchRecommendations(activeGuidance, true); // Append more when queue is empty
@@ -218,16 +230,28 @@ export default function EventsPage() {
       <header className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm space-y-4">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">NYC Discovery</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Events</h1>
             <p className="text-sm text-zinc-500">Curated cultural events.</p>
           </div>
           
-          {activeGuidance && (
-            <div className="flex items-center space-x-2 bg-pink-50 border border-pink-100 px-3 py-1.5 rounded-full text-xs font-medium text-pink-700">
-              <span>Focus: {activeGuidance}</span>
-              <button onClick={clearGuidance} className="hover:text-pink-900 font-bold ml-1">✕</button>
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleRefreshQueue}
+              className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium rounded-lg text-xs transition-all flex items-center space-x-1 border border-zinc-200"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+              </svg>
+              <span>Refresh Queue</span>
+            </button>
+
+            {activeGuidance && (
+              <div className="flex items-center space-x-2 bg-pink-50 border border-pink-100 px-3 py-1.5 rounded-full text-xs font-medium text-pink-700">
+                <span>Focus: {activeGuidance}</span>
+                <button onClick={clearGuidance} className="hover:text-pink-900 font-bold ml-1">✕</button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center space-x-2 bg-zinc-50 p-2 rounded-lg border border-zinc-200">
@@ -300,7 +324,7 @@ export default function EventsPage() {
             {recommendations.map((event) => {
               return (
                 <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto">
-                  <div className="flex items-center space-x-3 w-full md:w-[75%]">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
                     {/* Physical Question Mark Target */}
                     <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-zinc-100 text-zinc-700 font-bold text-xs cursor-help" title={event.why ? `Why: ${event.why}` : `View Description: ${event.description}`}>
                       ?
@@ -324,7 +348,7 @@ export default function EventsPage() {
                   </div>
 
                   {/* Actions in a vertical stack - Aligned to the right on desktop */}
-                  <div className="flex-shrink-0 flex items-center justify-end w-full md:w-auto md:flex-1">
+                  <div className="flex-shrink-0 flex items-center justify-end w-full md:w-auto">
                     <div className="flex flex-col space-y-1">
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
