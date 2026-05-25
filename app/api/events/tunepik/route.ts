@@ -10,22 +10,27 @@ const ai = new GoogleGenAI({});
 
 export async function GET(request: Request) {
   try {
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 14);
+
+    const startDateStr = startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const endDateStr = endDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     const systemInstruction = `Return ONLY a valid JSON array. Do not include any introductory text, conversational filler, or Markdown code blocks (like \`\`\`json). Start the response with [ and end it with ].`;
 
     const prompt = `You are an expert NYC Electronic Music Event Aggregator. 
-Find upcoming electronic music events in New York City taking place on or after ${today}.
+Find and scrape upcoming electronic music events in New York City from Resident Advisor (ra.co/events/us/newyorkcity) taking place between ${startDateStr} and ${endDateStr} (the next 2 weeks from today).
 
-CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Focus strictly on electronic music events (Techno, Deep House, Tech-House, House, Minimal, Acid, Leftfield/Experimental Electronic, Industrial, Disco, Breaks/Garage).
+CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Focus strictly on events listed on ra.co/events/us/newyorkcity (Resident Advisor NYC) in this 2-week window, classifying them strictly under: [Techno, Deep House, Tech-House, House, Minimal, Acid, Leftfield/Experimental Electronic, Industrial, Disco, Breaks/Garage].
 
-### TARGET PLACES to search:
-1. AGGREGATORS: Resident Advisor (ra.co/events/us/newyork), Shotgun.live NYC, Dice.fm NYC, Bandsintown NYC.
-2. DIRECT VENUES: SILO Brooklyn, BASEMENT NY, H0L0 NYC, Elsewere Brooklyn, Superior Ingredients, Bossa Nova Civic Club, House of Yes, Nowadays, 99 Scott, Mood Ring, Paragon, Teksupport.
+### TARGET DOMAIN TO SCRAPE:
+- Website: ra.co/events/us/newyorkcity
+- Do not rely on training data for dates, venues, or lineups. Pull live listings for the specified 2-week range.
 
 ### DIVERSITY & NORMALIZATION RULES:
-- Generate up to 10-15 real, upcoming events.
-- Extract direct ticket or primary listing URLs (NEVER output a homepage like "ra.co" or "dice.fm").
+- Generate up to 15 real, upcoming events from Resident Advisor.
+- Extract direct ticket or primary listing URLs (NEVER output a homepage like "ra.co" or "ra.co/events/us/newyorkcity").
 - Identify all performing artists for each event.
 - Classify each event into one of these exact computed_genre_category ENUMs:
   - "Techno" (Industrial, Techno, Hard Techno, Acid, Minimal)
