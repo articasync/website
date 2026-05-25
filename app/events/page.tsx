@@ -10,6 +10,8 @@ interface EventRecommendation {
   why?: string;
   time: string;
   link?: string;
+  spotifyArtistId?: string | null;
+  musicArtist?: string | null;
 }
 
 interface Interaction {
@@ -22,7 +24,19 @@ interface Interaction {
   reason: string;
   pinned: boolean;
   skipped: boolean;
+  spotifyArtistId?: string | null;
+  musicArtist?: string | null;
 }
+
+const SpotifyIcon = () => (
+  <svg
+    className="w-3.5 h-3.5 fill-current"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 0C5.373 0 0 5.372 0 12s5.373 12 12 12 12-5.372 12-12S18.627 0 12 0zm5.488 17.302c-.216.354-.68.468-1.033.252-2.862-1.748-6.463-2.146-10.704-1.177-.404.092-.814-.162-.907-.566-.092-.404.162-.814.566-.907 4.637-1.06 8.604-.6 11.826 1.367.353.216.467.68.252 1.031zm1.464-3.26c-.272.443-.855.584-1.298.312-3.275-2.013-8.267-2.597-12.137-1.422-.497.15-1.022-.13-1.173-.627-.151-.497.13-1.022.627-1.173 4.425-1.344 9.924-.69 13.67 1.615.442.272.583.855.311 1.295zm.126-3.41c-3.928-2.333-10.414-2.548-14.184-1.404-.603.183-1.246-.157-1.428-.76-.183-.603.157-1.246.76-1.428 4.336-1.316 11.492-1.066 16.007 1.613.542.322.72.1.397.64-.323.543-.398.72-.64.398z"/>
+  </svg>
+);
 
 export default function EventsPage() {
   const [recommendations, setRecommendations] = useState<EventRecommendation[]>([]);
@@ -37,6 +51,16 @@ export default function EventsPage() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
+  const [expandedSpotifyQueue, setExpandedSpotifyQueue] = useState<{ [key: string]: boolean }>({});
+  const [expandedSpotifyPinned, setExpandedSpotifyPinned] = useState<{ [key: string]: boolean }>({});
+
+  const toggleSpotifyQueue = (eventId: string) => {
+    setExpandedSpotifyQueue(prev => ({ ...prev, [eventId]: !prev[eventId] }));
+  };
+
+  const toggleSpotifyPinned = (eventId: string) => {
+    setExpandedSpotifyPinned(prev => ({ ...prev, [eventId]: !prev[eventId] }));
+  };
 
   useEffect(() => {
     // Clean up legacy cache key if it exists
@@ -212,6 +236,8 @@ export default function EventsPage() {
           reason: "", // No reason field
           pinned: isPin,
           skipped: isSkip,
+          spotifyArtistId: event.spotifyArtistId,
+          musicArtist: event.musicArtist,
         }),
       });
 
@@ -303,7 +329,7 @@ export default function EventsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pinnedEvents.map((event) => (
-              <div key={event.id} className="bg-white rounded-md p-2 shadow-sm border border-gray-100 relative group transition-all flex flex-col justify-between h-[100px]">
+              <div key={event.id} className="bg-white rounded-md p-2 shadow-sm border border-gray-100 relative group transition-all flex flex-col justify-between min-h-[100px] h-auto">
                 <div>
                   <div className="flex justify-between items-start">
                     <h3 className="text-xs font-bold text-gray-900 truncate" title={event.description}>{event.title}</h3>
@@ -311,9 +337,36 @@ export default function EventsPage() {
                   </div>
                   <p className="text-slate-500 text-[10px] font-medium truncate">{event.time}</p>
                 </div>
-                {event.link && (
-                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-800 hover:underline inline-block font-medium">Link</a>
-                )}
+                <div>
+                  <div className="flex items-center gap-2 mt-1">
+                    {event.link && (
+                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-800 hover:underline inline-block font-medium">Link</a>
+                    )}
+                    {event.spotifyArtistId && (
+                      <button
+                        onClick={() => toggleSpotifyPinned(event.id)}
+                        className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                      >
+                        <SpotifyIcon />
+                        {expandedSpotifyPinned[event.id] ? "Hide player" : "Listen"}
+                      </button>
+                    )}
+                  </div>
+
+                  {event.spotifyArtistId && expandedSpotifyPinned[event.id] && (
+                    <div className="mt-2 w-full overflow-hidden rounded border border-zinc-200 shadow-sm transition-all">
+                      <iframe
+                        src={`https://open.spotify.com/embed/artist/${event.spotifyArtistId}?utm_source=generator`}
+                        width="100%"
+                        height="80"
+                        frameBorder="0"
+                        allowFullScreen={false}
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -355,6 +408,33 @@ export default function EventsPage() {
                       <div className="mt-1 text-xs text-zinc-600">
                         {event.description}
                       </div>
+
+                      {/* Spotify Embed Widget */}
+                      {event.spotifyArtistId && (
+                        <div className="mt-2">
+                          <button
+                            onClick={() => toggleSpotifyQueue(event.id)}
+                            className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                          >
+                            <SpotifyIcon />
+                            {expandedSpotifyQueue[event.id] ? "Hide player" : `Listen to ${event.musicArtist || "artist"}`}
+                          </button>
+
+                          {expandedSpotifyQueue[event.id] && (
+                            <div className="mt-2 w-full max-w-lg overflow-hidden rounded border border-zinc-200 shadow-sm transition-all">
+                              <iframe
+                                src={`https://open.spotify.com/embed/artist/${event.spotifyArtistId}?utm_source=generator`}
+                                width="100%"
+                                height="80"
+                                frameBorder="0"
+                                allowFullScreen={false}
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 

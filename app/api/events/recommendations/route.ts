@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const ai = new GoogleGenAI({});
 
@@ -95,6 +96,15 @@ Before generating recommendations, analyze the user's history below.
 - Use PINNED events to find adjacent interests or similar venues.
 - Balance relevance with how soon the event is upcoming. Again, only suggest events that are taking place on or after ${today}.
 
+### MUSIC RECOMMENDATION & SPOTIFY LOOKUP:
+If the event is a concert, DJ set, live music show, performance, party, club night, or features a clear musical artist / DJ:
+- Identify the primary performing musical artist or DJ.
+- Use the Google Search tool to search for the artist's Spotify page URL. Formulate a search query like: "[Artist Name] site:open.spotify.com/artist/".
+- Locate the 22-character alphanumeric Spotify Artist ID from the search result URL (e.g., in "https://open.spotify.com/artist/4tZ59HO1h3wVx6H4TMotpq", the ID is "4tZ59HO1h3wVx6H4TMotpq").
+- Set "spotify_artist_id" to this 22-character ID. Make sure it is exactly the 22-character base62 string, not the full URL.
+- Set "music_artist" to the name of the main performing artist or DJ.
+- CRITICAL FOR TIMEOUTS: If the event is NOT music-related, or if you cannot find a valid 22-character Spotify Artist ID in a single simple search, immediately set BOTH "spotify_artist_id" and "music_artist" to null. Do NOT make multiple query attempts.
+
 ### OUTPUT FORMAT:
 Output as a strict JSON array of objects with these exact keys: 
 "id" (unique string), 
@@ -103,7 +113,9 @@ Output as a strict JSON array of objects with these exact keys:
 "time" (Format: 'Weekday, Month Day, Year, Time'), 
 "search_rationale" (Briefly state the exact website source AND quote the exact date/year mentioned in the search snippet to prove it is upcoming),
 "link" (CRITICAL: You MUST output a Google Search URL formatted EXACTLY like this: https://www.google.com/search?q=Event+Name+Venue+NYC+Tickets. Replace spaces with +. Only provide this Google Search link.),
-"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them).
+"why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them),
+"spotify_artist_id" (string or null),
+"music_artist" (string or null)
 `;
 
     const response = await ai.models.generateContent({
@@ -143,9 +155,21 @@ Output as a strict JSON array of objects with these exact keys:
       console.error("Model output was not valid JSON:", text);
     }
     
-    console.log(`Returning ${eventsArray.length} items from Gemini (Server-side validation bypassed).`);
+    const formattedEvents = eventsArray.map((event: any) => ({
+      id: event.id || String(Math.random()),
+      title: event.title,
+      description: event.description,
+      time: event.time,
+      link: event.link,
+      why: event.why,
+      searchRationale: event.search_rationale,
+      spotifyArtistId: event.spotify_artist_id || null,
+      musicArtist: event.music_artist || null,
+    }));
 
-    return NextResponse.json(eventsArray);
+    console.log(`Returning ${formattedEvents.length} items from Gemini (Server-side validation bypassed).`);
+
+    return NextResponse.json(formattedEvents);
 
   } catch (e: any) {
     console.error("Gemini Recommendations failed:", e);

@@ -68,6 +68,8 @@ model EventInteraction {
   reason      String?
   pinned      Boolean  @default(false)
   skipped     Boolean  @default(false)
+  spotifyArtistId String?
+  musicArtist     String?
   createdAt   DateTime @default(now())
 }
 
