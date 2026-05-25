@@ -58,12 +58,15 @@ export default function EventsPage() {
 
 
   useEffect(() => {
-    // Clean up legacy cache key if it exists
+    // Clean up legacy cache keys if they exist
     if (localStorage.getItem("event_recommendations")) {
       localStorage.removeItem("event_recommendations");
     }
+    if (localStorage.getItem("event_recommendations_v2")) {
+      localStorage.removeItem("event_recommendations_v2");
+    }
 
-    const saved = localStorage.getItem("event_recommendations_v2");
+    const saved = localStorage.getItem("event_recommendations_v3");
     const savedGuidance = localStorage.getItem("active_guidance") || "";
     
     setGuidance(savedGuidance);
@@ -107,7 +110,7 @@ export default function EventsPage() {
       if (Array.isArray(data)) {
         setRecommendations(prev => {
           const updated = append ? [...prev, ...data] : data;
-          localStorage.setItem("event_recommendations_v2", JSON.stringify(updated));
+          localStorage.setItem("event_recommendations_v3", JSON.stringify(updated));
           return updated;
         });
       } else {
@@ -187,7 +190,7 @@ export default function EventsPage() {
     localStorage.setItem("active_guidance", guidance);
     setRecommendations([]); // Wipe queue
     setExcludeTitles([]); // Reset exclusions for new focus
-    localStorage.removeItem("event_recommendations_v2");
+    localStorage.removeItem("event_recommendations_v3");
     fetchRecommendations(guidance, false, []); // Fetch fresh 10 with empty exclusions
     toast.success("Applied guidance to current generation!");
   };
@@ -198,7 +201,7 @@ export default function EventsPage() {
     localStorage.removeItem("active_guidance");
     setRecommendations([]); // Wipe queue
     setExcludeTitles([]); // Reset exclusions
-    localStorage.removeItem("event_recommendations_v2");
+    localStorage.removeItem("event_recommendations_v3");
     fetchRecommendations("", false, []); // Fetch fresh 10 with empty exclusions
     toast.success("Cleared guidance focus!");
   };
@@ -209,7 +212,7 @@ export default function EventsPage() {
     setExcludeTitles(newExclude);
 
     setRecommendations([]);
-    localStorage.removeItem("event_recommendations_v2");
+    localStorage.removeItem("event_recommendations_v3");
     fetchRecommendations(activeGuidance, false, newExclude);
     toast.success("Queue reset! Fetching fresh recommendations...");
   };
@@ -247,7 +250,7 @@ export default function EventsPage() {
 
       const next = recommendations.filter(e => e.id !== eventId);
       setRecommendations(next);
-      localStorage.setItem("event_recommendations_v2", JSON.stringify(next));
+      localStorage.setItem("event_recommendations_v3", JSON.stringify(next));
 
       if (next.length === 0) {
         fetchRecommendations(activeGuidance, true, excludeTitles); // Append more when queue is empty using active exclusions
