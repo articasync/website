@@ -35,14 +35,23 @@ CURRENT REFERENCE DATE: ${today}.
 CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do not rely on training data for dates or links. 
 
 ### PREFERRED TARGET SOURCES & NYC VENUES:
-1. SEARCH PLATFORMS: Actively look for upcoming concerts, underground shows, and music events on:
+1. MUSIC & NIGHTLIFE PLATFORMS: Search for upcoming concerts, underground shows, and music events on:
    - Resident Advisor (residentadvisor.net)
    - Bandcamp (bandcamp.com)
    - EDMTrain (edmtrain.com)
-2. SPECIFIC NYC VENUES: Actively check and search calendars for real local venues, such as:
-   - Brooklyn Steel, Elsewhere, Avant Gardner / The Brooklyn Mirage, Knockdown Center
-   - Webster Hall, Bowery Ballroom, Music Hall of Williamsburg, TV Eye, Baby's All Right, Pioneer Works, Union Pool, etc.
-   Formulate targeted Google Search queries using these platforms and venues to retrieve accurate real-time listings.
+2. SPECIFIC MUSIC & PERFORMANCE VENUES: Check calendars for local music and night venues (e.g., Brooklyn Steel, Elsewhere, Avant Gardner / The Brooklyn Mirage, Knockdown Center, Webster Hall, Bowery Ballroom, Music Hall of Williamsburg, TV Eye, Baby's All Right, Pioneer Works, Union Pool, etc.).
+3. OTHER CULTURAL & DIVERSE EVENT PLATFORMS: To ensure a rich variety beyond music and concerts, actively search for other event types (e.g., art openings, street fairs, tech/maker workshops, food markets, guest lectures, design exhibitions, comedy shows, theater events, literary readings) on platforms like:
+   - TimeOut New York (timeout.com/newyork)
+   - The Skint (theskint.com)
+   - Nonsense NYC (nonsensenyc.com)
+   - Brooklyn Paper or local NYC event boards
+   - Museum calendars (e.g., MoMA, Brooklyn Museum, Whitney, Cooper Hewitt)
+   - Cultural centers (e.g., Lincoln Center, BAM, Park Avenue Armory)
+   Formulate diverse Google Search queries using these platforms and venues to retrieve a wide variety of accurate real-time listings.
+
+### DIVERSITY & EXPLORATION BALANCE:
+- CRITICAL: Music concerts and nightlife MUST NOT be the only recommendations. Aim for a balanced, rich mix (e.g., 40% music/shows, 30% art/culture/exhibits, 30% learning/workshops/exploration/pop-ups).
+- EXPLORATION: Include at least one or two completely "exploratory" or unique niche events in each recommendation set (e.g., a weird neighborhood walking tour, a specialized craft workshop, a science talk in a bar, or an obscure gallery opening) to keep the recommendations fresh and unexpected.
 
 ### EVENT CRITERIA:
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
