@@ -64,8 +64,8 @@ CRITICAL: You MUST use the Google Search tool to find REAL, upcoming events. Do 
    Formulate diverse Google Search queries using these platforms and venues to retrieve a wide variety of accurate real-time listings.
 
 ### DIVERSITY & EXPLORATION BALANCE:
-- CRITICAL: Music concerts and nightlife MUST NOT be the only recommendations. Aim for a balanced, rich mix (e.g., 40% music/shows, 30% art/culture/exhibits, 30% learning/workshops/exploration/pop-ups).
-- EXPLORATION: Include at least one or two completely "exploratory" or unique niche events in each recommendation set (e.g., a weird neighborhood walking tour, a specialized craft workshop, a science talk in a bar, or an obscure gallery opening) to keep the recommendations fresh and unexpected.
+- CRITICAL MIX (NO SPECIFIC FOCUS): If the "General Guidance" under USER CONTEXT is empty or highly generic, you MUST maintain a balanced, rich mix of event types (e.g., 40% music/shows, 30% art/culture/exhibits, 30% learning/workshops/exploration/pop-ups) and include at least 1-2 completely "exploratory" or unique niche events to keep recommendations fresh and unexpected.
+- FOCUS OVERRIDE: If a specific "General Guidance" focus is provided (e.g., a specific topic, genre, neighborhood, or type of event like "jazz", "art openings", "comedy"), do NOT try to force a blend of different activity types or search sources. Focus 100% purely on the specified focus! If they ask for music/concerts, generate ONLY music/concert recommendations. If they ask for art, generate ONLY art recommendations. Do not mix other activity types into a specific focus query.
 
 ### EVENT CRITERIA:
 1. DATE ACCURACY: All recommended events MUST take place on or after ${today}.
