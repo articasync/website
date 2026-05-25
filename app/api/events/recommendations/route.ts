@@ -114,7 +114,8 @@ Output as a strict JSON array of objects with these exact keys:
 "why" (Provide an in-depth explanation of why this aligns with their profile, referencing their pins/skips and explaining why it fits and was selected for them),
 "spotify_artist_id" (string or null),
 "music_artist" (string or null),
-"expected_price" (Estimate the ticket price. When you do not know the price, say "$Unknown". If it varies, try to specify a range like "$20-$40". Otherwise, set to "Free" or a specific amount like "$20" based on search snippets or reasonable predictions. Keep it short and clear.)
+"expected_price" (Estimate the ticket price. When you do not know the price, say "$Unknown". If it varies, try to specify a range like "$20-$40". Otherwise, set to "Free" or a specific amount like "$20" based on search snippets or reasonable predictions. Keep it short and clear.),
+"neighborhood" (Extract or predict the NYC neighborhood/borough where the venue or event is located, e.g., "East Village", "Williamsburg", "Bushwick", "Astoria", "Manhattan", "Brooklyn". Keep it short, 1-3 words. Set to null if unknown.)
 `;
 
     const response = await ai.models.generateContent({
@@ -165,6 +166,7 @@ Output as a strict JSON array of objects with these exact keys:
       spotifyArtistId: event.spotify_artist_id || null,
       musicArtist: event.music_artist || null,
       expectedPrice: event.expected_price || null,
+      neighborhood: event.neighborhood || null,
     }));
 
     console.log(`Returning ${formattedEvents.length} items from Gemini (Server-side validation bypassed).`);

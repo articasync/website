@@ -13,6 +13,7 @@ interface EventRecommendation {
   spotifyArtistId?: string | null;
   musicArtist?: string | null;
   expectedPrice?: string | null;
+  neighborhood?: string | null;
 }
 
 interface Interaction {
@@ -28,6 +29,7 @@ interface Interaction {
   spotifyArtistId?: string | null;
   musicArtist?: string | null;
   expectedPrice?: string | null;
+  neighborhood?: string | null;
 }
 
 const SpotifyIcon = () => (
@@ -232,6 +234,7 @@ export default function EventsPage() {
           spotifyArtistId: event.spotifyArtistId,
           musicArtist: event.musicArtist,
           expectedPrice: event.expectedPrice,
+          neighborhood: event.neighborhood,
         }),
       });
 
@@ -329,7 +332,14 @@ export default function EventsPage() {
                     <h3 className="text-xs font-bold text-gray-900 truncate" title={event.description}>{event.title}</h3>
                     <button onClick={() => handleUnpin(event.id)} className="text-xs text-red-500 hover:text-red-700 font-bold p-1">X</button>
                   </div>
-                  <p className="text-slate-500 text-[10px] font-medium truncate">{event.time}</p>
+                  <div className="flex justify-between items-center mt-0.5 text-[10px] font-medium">
+                    <p className="text-slate-500 truncate flex-1 pr-1">{event.time}</p>
+                    {event.neighborhood && (
+                      <span className="text-zinc-400 flex-shrink-0 ml-1" title={`Neighborhood: ${event.neighborhood}`}>
+                        📍 {event.neighborhood}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 justify-between mt-auto">
                   <div className="flex items-center gap-2">
@@ -413,6 +423,11 @@ export default function EventsPage() {
                               : "bg-zinc-100 text-zinc-800 border-zinc-200"
                           }`}>
                             {event.expectedPrice}
+                          </span>
+                        )}
+                        {event.neighborhood && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-50 text-zinc-500 border border-zinc-200">
+                            📍 {event.neighborhood}
                           </span>
                         )}
                       </div>

@@ -71,6 +71,7 @@ model EventInteraction {
   spotifyArtistId String?
   musicArtist     String?
   expectedPrice   String?
+  neighborhood    String?
   createdAt   DateTime @default(now())
 }
 

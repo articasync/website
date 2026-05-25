@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, description, time, link, rating, reason, pinned, skipped, spotifyArtistId, musicArtist, expectedPrice } = body;
+    const { title, description, time, link, rating, reason, pinned, skipped, spotifyArtistId, musicArtist, expectedPrice, neighborhood } = body;
 
     const interaction = await prisma.eventInteraction.create({
       data: {
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         spotifyArtistId: spotifyArtistId || null,
         musicArtist: musicArtist || null,
         expectedPrice: expectedPrice || null,
+        neighborhood: neighborhood || null,
       },
     });
 
