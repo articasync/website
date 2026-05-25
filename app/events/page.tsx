@@ -36,7 +36,6 @@ export default function EventsPage() {
   const [activeGuidance, setActiveGuidance] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
-  const [ratingInputs, setRatingInputs] = useState<{ [id: string]: { reason: string } }>({});
 
   useEffect(() => {
     const saved = localStorage.getItem("event_recommendations");
@@ -53,11 +52,6 @@ export default function EventsPage() {
           setRecommendations(parsed);
           setLoading(false);
           
-          const inputs: any = {};
-          parsed.forEach((ev: EventRecommendation) => {
-            inputs[ev.id] = { reason: "" };
-          });
-          setRatingInputs(inputs);
           loadedFromCache = true;
         }
       } catch (e) {}
@@ -87,12 +81,6 @@ export default function EventsPage() {
           localStorage.setItem("event_recommendations", JSON.stringify(updated));
           return updated;
         });
-        
-        const inputs: any = {};
-        data.forEach((ev: EventRecommendation) => {
-          inputs[ev.id] = { reason: "" };
-        });
-        setRatingInputs(prev => ({ ...prev, ...inputs }));
       } else {
         toast.error(data.error || "Failed to load events");
       }
@@ -185,7 +173,6 @@ export default function EventsPage() {
   };
 
   const handleRateAndReplace = async (eventId: string, isPin: boolean = false, isSkip: boolean = false) => {
-    const input = ratingInputs[eventId] || { reason: "" };
     const event = recommendations.find(e => e.id === eventId);
     if (!event) return;
 
@@ -199,7 +186,7 @@ export default function EventsPage() {
           description: event.description,
           time: event.time,
           link: event.link,
-          reason: input.reason,
+          reason: "", // No reason field
           pinned: isPin,
           skipped: isSkip,
         }),
@@ -311,7 +298,6 @@ export default function EventsPage() {
         ) : (
           <div className="space-y-2">
             {recommendations.map((event) => {
-              const input = ratingInputs[event.id] || { rating: 5, reason: "" };
               return (
                 <div key={event.id} className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 space-x-0 md:space-x-3 p-2 border border-zinc-100 rounded-lg bg-white hover:shadow-sm transition-all text-sm h-auto">
                   <div className="flex items-center space-x-3 w-full md:w-[75%]">
@@ -337,26 +323,18 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  {/* Inputs and Actions in a horizontal flex layout - Shrunk on Desktop, full width on mobile */}
-                  <div className="w-full flex md:flex-1 items-center justify-end space-x-1">
-                    <input
-                      type="text"
-                      placeholder="Why pin/skip?"
-                      value={ratingInputs[event.id]?.reason || ""}
-                      onChange={(e) => setRatingInputs(prev => ({ ...prev, [event.id]: { reason: e.target.value } }))}
-                      className="px-2 py-1 text-xs border border-zinc-200 rounded-md outline-none focus:border-zinc-500 w-[240px] h-[28px]"
-                    />
-
-                    <div className="flex space-x-1">
+                  {/* Actions in a vertical stack - Aligned to the right on desktop */}
+                  <div className="flex-shrink-0 flex items-center justify-end w-full md:w-auto md:flex-1">
+                    <div className="flex flex-col space-y-1">
                       <button
                         onClick={() => handleRateAndReplace(event.id, true, false)}
-                        className="px-2 py-1 bg-zinc-800 hover:bg-zinc-900 text-white font-medium text-xs rounded-md transition-all h-[28px]"
+                        className="px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs rounded-md transition-all h-[28px] w-[60px] text-center"
                       >
                         Pin
                       </button>
                       <button
                         onClick={() => handleRateAndReplace(event.id, false, true)}
-                        className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-xs rounded-md transition-all h-[28px]"
+                        className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-xs rounded-md transition-all h-[28px] w-[60px] text-center"
                       >
                         Skip
                       </button>
