@@ -1,8 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { runSimulation } from "@/lib/physics";
 import { useSimulatorStore } from "@/store/useSimulatorStore";
-import { Hardware } from "@/types/simulator";
+import { ChartToggles, Hardware } from "@/types/simulator";
 
 interface SliderConfig {
   key: keyof Hardware;
@@ -43,6 +54,58 @@ const HARDWARE_SLIDERS: SliderConfig[] = [
   },
 ];
 
+interface ToggleMeta {
+  key: keyof ChartToggles;
+  label: string;
+  color: string;
+  activeClass: string;
+}
+
+const TOGGLE_CONFIGS: ToggleMeta[] = [
+  {
+    key: "showWatts",
+    label: "Watts",
+    color: "#9ca3af",
+    activeClass: "bg-gray-600 text-white border-gray-600",
+  },
+  {
+    key: "showHR",
+    label: "Heart Rate",
+    color: "#ef4444",
+    activeClass: "bg-red-500 text-white border-red-500",
+  },
+  {
+    key: "showMuscleH",
+    label: "Muscle Lactate",
+    color: "#8b5cf6",
+    activeClass: "bg-purple-600 text-white border-purple-600",
+  },
+  {
+    key: "showBloodH",
+    label: "Blood Lactate",
+    color: "#3b82f6",
+    activeClass: "bg-blue-600 text-white border-blue-600",
+  },
+  {
+    key: "showPCr1",
+    label: "Type 1 PCr",
+    color: "#10b981",
+    activeClass: "bg-emerald-600 text-white border-emerald-600",
+  },
+  {
+    key: "showPCr2",
+    label: "Type 2 PCr",
+    color: "#f59e0b",
+    activeClass: "bg-amber-500 text-white border-amber-500",
+  },
+  {
+    key: "showEpi",
+    label: "Epinephrine",
+    color: "#f97316",
+    activeClass: "bg-orange-500 text-white border-orange-500",
+  },
+];
+
 export default function SimulatorClient() {
   const {
     hardware,
@@ -51,7 +114,26 @@ export default function SimulatorClient() {
     updateWorkoutBlock,
     addWorkoutBlock,
     removeWorkoutBlock,
+    toggles,
+    setToggle,
   } = useSimulatorStore();
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Physics execution recalculates instantly when inputs change
+  const simulationData = useMemo(
+    () => runSimulation(hardware, workout),
+    [hardware, workout]
+  );
+
+  // Check if simulation triggered failure
+  const blowupPoint = useMemo(
+    () => simulationData.find((p) => p.blown_up),
+    [simulationData]
+  );
 
   // Dynamic MLSS calculation from physics baseline formula
   const fiberType2 = 1.0 - hardware.fiberType1;
@@ -74,18 +156,29 @@ export default function SimulatorClient() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {blowupPoint && (
+            <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-right">
+              <span className="text-xs uppercase font-bold tracking-wider text-red-600">
+                Status
+              </span>
+              <div className="text-sm font-bold text-red-800">
+                Blown Up @ {blowupPoint.time}s
+              </div>
+            </div>
+          )}
           <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 text-right">
             <span className="text-xs uppercase font-bold tracking-wider text-indigo-600">
               Calculated MLSS
             </span>
             <div className="text-2xl font-black text-indigo-950">
-              {calculatedMLSS} <span className="text-sm font-semibold text-indigo-600">W</span>
+              {calculatedMLSS}{" "}
+              <span className="text-sm font-semibold text-indigo-600">W</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grid Layout: Sidebar (Hardware) + Main (Chart Placeholder) + Bottom (Workout Builder) */}
+      {/* Grid Layout: Sidebar (Hardware) + Main (Recharts Graph) + Bottom (Workout Builder) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Sidebar: Hardware Sliders (4 Cols on lg) */}
         <aside className="lg:col-span-4 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-5">
@@ -100,7 +193,10 @@ export default function SimulatorClient() {
             {HARDWARE_SLIDERS.map(({ key, label, description }) => {
               const value = hardware[key];
               return (
-                <div key={key} className="space-y-1.5 bg-gray-50/70 p-3 rounded-xl border border-gray-100">
+                <div
+                  key={key}
+                  className="space-y-1.5 bg-gray-50/70 p-3 rounded-xl border border-gray-100"
+                >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-gray-800">{label}</span>
                     <span className="font-mono font-bold text-indigo-600 bg-white px-2 py-0.5 rounded border border-gray-200 shadow-2xs">
@@ -127,27 +223,182 @@ export default function SimulatorClient() {
           </div>
         </aside>
 
-        {/* Main Center Area: Chart Placeholder (8 Cols on lg) */}
-        <main className="lg:col-span-8 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm min-h-[440px] flex flex-col items-center justify-center text-center">
-          <div className="p-4 bg-indigo-50/60 rounded-full text-indigo-500 mb-3">
-            <svg
-              className="w-10 h-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-              />
-            </svg>
+        {/* Main Center Area: Live Recharts Graph & Toggles (8 Cols on lg) */}
+        <main className="lg:col-span-8 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+          {/* Toggles UI: Pill Buttons */}
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-gray-100 pb-3">
+            <div className="text-xs font-bold text-gray-600 uppercase tracking-wider">
+              Chart Traces:
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {TOGGLE_CONFIGS.map(({ key, label, activeClass, color }) => {
+                const isActive = toggles[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setToggle(key)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all flex items-center gap-1.5 ${
+                      isActive
+                        ? activeClass
+                        : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full inline-block"
+                      style={{ backgroundColor: color }}
+                    />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">Chart goes here</h3>
-          <p className="text-xs text-gray-400 mt-1 max-w-sm">
-            Simulation traces for HR, Watts, Muscle/Blood Lactate, PCr, Epinephrine, and Core Temp will render here.
-          </p>
+
+          {/* Chart View */}
+          <div className="w-full min-h-[400px] flex items-center justify-center">
+            {!isMounted ? (
+              <div className="flex flex-col items-center justify-center h-[400px] text-gray-400 space-y-2">
+                <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs">Loading simulator charts...</span>
+              </div>
+            ) : simulationData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
+                <span className="text-sm">No simulation data available. Add workout intervals below.</span>
+              </div>
+            ) : (
+              <div className="w-full h-[400px]">
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart
+                    data={simulationData}
+                    margin={{ top: 5, right: 20, left: -20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                    <XAxis
+                      dataKey="time"
+                      tick={{ fontSize: 12 }}
+                      stroke="#9ca3af"
+                      label={{
+                        value: "Time (s)",
+                        position: "insideBottomRight",
+                        offset: -5,
+                        fontSize: 10,
+                        fill: "#9ca3af",
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e5e7eb",
+                        borderRadius: "0.75rem",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
+                    <YAxis
+                      yAxisId="left"
+                      orientation="left"
+                      tick={{ fontSize: 12 }}
+                      stroke="#6b7280"
+                    />
+                    <YAxis
+                      yAxisId="right"
+                      orientation="right"
+                      tick={{ fontSize: 12 }}
+                      stroke="#6b7280"
+                    />
+
+                    {toggles.showWatts && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="watts"
+                        name="Watts"
+                        yAxisId="left"
+                        stroke="#9ca3af"
+                        strokeDasharray="5 5"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showHR && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="hr"
+                        name="Heart Rate (bpm)"
+                        yAxisId="left"
+                        stroke="#ef4444"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showMuscleH && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="la_muscle"
+                        name="Muscle Lactate (mmol/L)"
+                        yAxisId="right"
+                        stroke="#8b5cf6"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showBloodH && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="la_blood"
+                        name="Blood Lactate (mmol/L)"
+                        yAxisId="right"
+                        stroke="#3b82f6"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showPCr1 && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="pcr1"
+                        name="Type 1 PCr"
+                        yAxisId="right"
+                        stroke="#10b981"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showPCr2 && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="pcr2"
+                        name="Type 2 PCr"
+                        yAxisId="right"
+                        stroke="#f59e0b"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {toggles.showEpi && (
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="epi"
+                        name="Epinephrine"
+                        yAxisId="right"
+                        stroke="#f97316"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
         </main>
 
         {/* Bottom Pane: Workout Builder (Full 12 Cols) */}
