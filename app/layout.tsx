@@ -28,6 +28,7 @@ export default function RootLayout({
               <Link href="/words" className="text-gray-600 hover:text-black font-medium transition-colors">Words</Link>
               <Link href="/events" className="text-gray-600 hover:text-black font-medium transition-colors">Events</Link>
               <Link href="/tunepik" className="text-gray-600 hover:text-black font-medium transition-colors">Tunepik</Link>
+              <Link href="/cycling" className="text-gray-600 hover:text-black font-medium transition-colors">Cycling</Link>
             </div>
           </nav>
           <div className="container mx-auto p-4 sm:p-8">
