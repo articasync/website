@@ -13,7 +13,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { runSimulation } from "@/lib/physics";
+import {
+  calculateBaselineMLSS,
+  findMaxPowerForDuration,
+  runSimulation,
+} from "@/lib/physics";
 import { useSimulatorStore } from "@/store/useSimulatorStore";
 import { ChartToggles, Hardware, SimulationPoint } from "@/types/simulator";
 
@@ -76,7 +80,7 @@ const HARDWARE_SLIDERS: SliderConfig[] = [
   {
     key: "coolingEfficiency",
     label: "Cooling Rate",
-    description: "Thermoregulatory heat dissipation efficiency",
+    description: "Thermoregulation heat dissipation efficiency",
     min: 10,
     max: 50,
     step: 1,
@@ -263,31 +267,17 @@ export default function SimulatorClient() {
     [simulationData]
   );
 
-  // Normalize biological units to 0.0 - 1.0 mathematical coefficients for baseline estimates
-  const normMito = hardware.mitoDensity / 15.0;
-  const normMct1 = hardware.mct1Density / 300.0;
-  const normMct4 = hardware.mct4Density / 300.0;
-  const normBuffer = hardware.bufferCapacity / 100.0;
-  const normFiber1 = hardware.fiberType1 / 100.0;
-
-  // Dynamic MLSS calculation from physics baseline formula
-  const fiberType2 = 1.0 - normFiber1;
-  const calculatedMLSS = Math.round(
-    150 +
-      300 * normMito * normFiber1 * normMct1 -
-      50 * fiberType2 * normMct4
-  );
-  const power1h = calculatedMLSS;
-  const power5m = Math.round(
-    calculatedMLSS +
-      100 * normMito * normMct1 +
-      50 * fiberType2
-  );
-  const power1m = Math.round(
-    calculatedMLSS +
-      250 * normMct4 * normBuffer * fiberType2
-  );
-  const power5s = Math.round(calculatedMLSS + 800 * fiberType2);
+  // Simulation-based binary search for power-duration profile and baseline MLSS
+  const { mlss, ftp, p5m, p1m, p5s } = useMemo(() => {
+    const mlssVal = Math.round(calculateBaselineMLSS(hardware));
+    return {
+      mlss: mlssVal,
+      ftp: findMaxPowerForDuration(hardware, 3600), // 1 hour
+      p5m: findMaxPowerForDuration(hardware, 300), // 5 mins
+      p1m: findMaxPowerForDuration(hardware, 60), // 1 min
+      p5s: findMaxPowerForDuration(hardware, 5), // 5 secs
+    };
+  }, [hardware]);
 
   // Power zone shading areas mapped over workout blocks
   const zoneAreas = useMemo(() => {
@@ -300,10 +290,10 @@ export default function SimulatorClient() {
         id: block.id || `zone-${index}`,
         start,
         end,
-        color: getZoneColor(block.watts, calculatedMLSS),
+        color: getZoneColor(block.watts, mlss),
       };
     });
-  }, [workout, calculatedMLSS]);
+  }, [workout, mlss]);
 
   // Handler to generate repeated interval blocks
   const handleGenerateIntervals = () => {
@@ -321,7 +311,7 @@ export default function SimulatorClient() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Page Header */}
+      {/* Page Header with 5 Power & Metabolic Stat Cards */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
@@ -343,44 +333,65 @@ export default function SimulatorClient() {
             </div>
           )}
 
-          {/* 5s Power */}
-          <div className="bg-amber-50/80 border border-amber-200 rounded-xl px-3 py-1.5 text-center min-w-[72px]">
+          {/* 1. 5s Power */}
+          <div className="bg-amber-50/80 border border-amber-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
             <span className="text-[10px] uppercase font-bold tracking-wider text-amber-700 block">
               5s Power
             </span>
             <div className="text-base font-bold text-amber-950">
-              {power5s} <span className="text-xs font-semibold text-amber-700">W</span>
+              {p5s} <span className="text-xs font-semibold text-amber-700">W</span>
             </div>
           </div>
 
-          {/* 1m Power */}
-          <div className="bg-orange-50/80 border border-orange-200 rounded-xl px-3 py-1.5 text-center min-w-[72px]">
+          {/* 2. 1m Power */}
+          <div className="bg-orange-50/80 border border-orange-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
             <span className="text-[10px] uppercase font-bold tracking-wider text-orange-700 block">
               1m Power
             </span>
             <div className="text-base font-bold text-orange-950">
-              {power1m} <span className="text-xs font-semibold text-orange-700">W</span>
+              {p1m} <span className="text-xs font-semibold text-orange-700">W</span>
             </div>
           </div>
 
-          {/* 5m Power */}
-          <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl px-3 py-1.5 text-center min-w-[72px]">
+          {/* 3. 5m Power */}
+          <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
             <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-700 block">
               5m Power
             </span>
             <div className="text-base font-bold text-emerald-950">
-              {power5m} <span className="text-xs font-semibold text-emerald-700">W</span>
+              {p5m} <span className="text-xs font-semibold text-emerald-700">W</span>
             </div>
           </div>
 
-          {/* 1h / MLSS (More prominent) */}
-          <div className="bg-indigo-50 border-2 border-indigo-300 rounded-xl px-3.5 py-1.5 text-center min-w-[84px] shadow-xs">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-700 block">
-              1h (MLSS)
+          {/* 4. 1h Power (FTP - Exhaustion Limit) */}
+          <div className="bg-blue-50/90 border border-blue-200 rounded-xl px-3 py-1.5 text-center min-w-[78px]">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-blue-700 block">
+              1h (FTP)
             </span>
-            <div className="text-lg font-black text-indigo-950">
-              {power1h} <span className="text-xs font-bold text-indigo-700">W</span>
+            <div className="text-base font-bold text-blue-950">
+              {ftp} <span className="text-xs font-semibold text-blue-700">W</span>
             </div>
+          </div>
+
+          {/* 5. Calculated MLSS (Metabolic Equilibrium Point - Distinct Emphasis) */}
+          <div className="bg-indigo-50 border-2 border-indigo-400/80 rounded-xl px-3.5 py-1.5 text-center min-w-[86px] shadow-xs ring-1 ring-indigo-200/60">
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-[10px] uppercase font-black tracking-wider text-indigo-700 block">
+                MLSS
+              </span>
+              <span
+                title="Maximal Lactate Steady State: The highest steady power where metabolic lactate production equals systemic clearance."
+                className="inline-flex items-center justify-center w-3 h-3 rounded-full bg-indigo-200/80 text-[8px] font-bold text-indigo-700 cursor-help"
+              >
+                i
+              </span>
+            </div>
+            <div className="text-lg font-black text-indigo-950 leading-tight">
+              {mlss} <span className="text-xs font-bold text-indigo-700">W</span>
+            </div>
+            <span className="text-[9px] font-medium text-indigo-600/80 block">
+              Equilibrium
+            </span>
           </div>
         </div>
       </div>
