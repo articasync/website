@@ -307,6 +307,7 @@ export default function SimulatorClient() {
         id: `zone-${index}`,
         start,
         end,
+        watts: block.watts,
         color: getZoneColor(block.watts, mlss),
       };
     });
@@ -509,7 +510,9 @@ export default function SimulatorClient() {
                           fill: "#9ca3af",
                         }}
                       />
-                      {/* Single hidden YAxis with fixed 0-100 domain */}
+                      {/* Left YAxis scaled 0-1000 for target wattage reference area stepped heights */}
+                      <YAxis yAxisId="left" hide={true} domain={[0, 1000]} />
+                      {/* Default YAxis with fixed 0-100 domain for normalized traces */}
                       <YAxis hide={true} domain={[0, 100]} />
 
                       <Tooltip
@@ -537,14 +540,17 @@ export default function SimulatorClient() {
                         wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                       />
 
-                      {/* Zone background reference shading */}
+                      {/* Stepped power zone background reference shading */}
                       {zoneAreas.map((area, index) => (
                         <ReferenceArea
                           key={area.id ?? index}
                           x1={area.start}
                           x2={area.end}
+                          y1={0}
+                          y2={area.watts}
+                          yAxisId="left"
                           fill={area.color}
-                          fillOpacity={0.4}
+                          fillOpacity={0.6}
                           strokeOpacity={0}
                         />
                       ))}
@@ -830,11 +836,11 @@ export default function SimulatorClient() {
                     </div>
                   </div>
 
-                  {/* Interval Subsection: Shaded box with Recovery Power, Recovery Duration, Repeats */}
+                  {/* Secondary Interval Subsection: Shaded box with Power 2, Duration 2, Repeats */}
                   <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-indigo-50/50 border border-indigo-100 rounded-lg p-2 flex-1 min-w-0">
                     <div className="flex-1 min-w-[100px]">
                       <label className="block text-[10px] font-medium text-gray-600 mb-0.5 truncate">
-                        Recovery Power (W)
+                        Power 2 (W)
                       </label>
                       <input
                         type="number"
@@ -857,7 +863,7 @@ export default function SimulatorClient() {
 
                     <div className="flex-1 min-w-[100px]">
                       <label className="block text-[10px] font-medium text-gray-600 mb-0.5 truncate">
-                        Recovery Duration (s)
+                        Duration 2 (s)
                       </label>
                       <input
                         type="number"
