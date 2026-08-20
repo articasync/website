@@ -20,7 +20,10 @@ export interface SimulatorState {
     updates: Partial<Omit<WorkoutBlock, "id">>
   ) => void;
   addWorkoutBlock: (block?: Partial<Omit<WorkoutBlock, "id">>) => void;
+  addWorkoutBlocks: (blocks: Array<Partial<Omit<WorkoutBlock, "id">>>) => void;
   removeWorkoutBlock: (id: string) => void;
+  reorderWorkoutBlocks: (startIndex: number, endIndex: number) => void;
+  clearWorkout: () => void;
   setToggle: (key: keyof ChartToggles, value?: boolean) => void;
   setSimulationResults: (results: SimulationPoint[]) => void;
   resetToDefaults: () => void;
@@ -33,6 +36,8 @@ export const DEFAULT_HARDWARE: Hardware = {
   bufferCapacity: 0.5,
   fiberType1: 0.6,
   coolingEfficiency: 0.5,
+  sweatRate: 0.5,
+  svMax: 120,
 };
 
 export const DEFAULT_WORKOUT: WorkoutBlock[] = [
@@ -49,7 +54,17 @@ export const DEFAULT_TOGGLES: ChartToggles = {
   showPCr1: true,
   showPCr2: false,
   showEpi: false,
+  showGlycogen: false,
+  showPi: false,
+  showGutIschemia: false,
 };
+
+function generateUniqueId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `block-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+}
 
 export const useSimulatorStore = create<SimulatorState>((set) => ({
   hardware: DEFAULT_HARDWARE,
@@ -77,17 +92,37 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
   addWorkoutBlock: (block) =>
     set((state) => {
       const newBlock: WorkoutBlock = {
-        id: `block-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        id: generateUniqueId(),
         watts: block?.watts ?? 200,
-        durationSeconds: block?.durationSeconds ?? 180,
+        durationSeconds: block?.durationSeconds ?? 60,
       };
       return { workout: [...state.workout, newBlock] };
+    }),
+
+  addWorkoutBlocks: (blocks) =>
+    set((state) => {
+      const newBlocks: WorkoutBlock[] = blocks.map((block) => ({
+        id: generateUniqueId(),
+        watts: block?.watts ?? 200,
+        durationSeconds: block?.durationSeconds ?? 60,
+      }));
+      return { workout: [...state.workout, ...newBlocks] };
     }),
 
   removeWorkoutBlock: (id) =>
     set((state) => ({
       workout: state.workout.filter((block) => block.id !== id),
     })),
+
+  reorderWorkoutBlocks: (startIndex, endIndex) =>
+    set((state) => {
+      const newWorkout = Array.from(state.workout);
+      const [removed] = newWorkout.splice(startIndex, 1);
+      newWorkout.splice(endIndex, 0, removed);
+      return { workout: newWorkout };
+    }),
+
+  clearWorkout: () => set({ workout: [] }),
 
   setToggle: (key, value) =>
     set((state) => ({

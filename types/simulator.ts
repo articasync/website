@@ -17,6 +17,10 @@ export interface Hardware {
   fiberType1: number;
   /** Thermoregulatory cooling efficiency (0 - 1) */
   coolingEfficiency: number;
+  /** Sweat rate for dehydration dynamics (0 - 1) */
+  sweatRate: number;
+  /** Maximum stroke volume in mL (100 - 150) */
+  svMax: number;
 }
 
 export interface ChartToggles {
@@ -27,17 +31,24 @@ export interface ChartToggles {
   showPCr2: boolean;
   showEpi: boolean;
   showWatts: boolean;
+  showGlycogen: boolean;
+  showPi: boolean;
+  showGutIschemia: boolean;
 }
 
 export interface SimulationPoint {
   time: number;
   watts: number;
-  hr: number;
-  la_muscle: number;
-  la_blood: number;
-  pcr1: number;
-  pcr2: number;
-  core_temp: number;
-  epi: number;
+  hr: number | null;
+  la_muscle: number | null;
+  la_blood: number | null;
+  pcr1: number | null;
+  pcr2: number | null;
+  core_temp: number | null;
+  epi: number | null;
   blown_up: boolean;
+  glycogen: number | null;
+  pi: number | null;
+  gut_ischemia: number | null;
+  sv: number | null;
 }
