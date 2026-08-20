@@ -5,21 +5,21 @@ export interface WorkoutBlock {
 }
 
 export interface Hardware {
-  /** Mitochondrial density (0 - 1) */
+  /** Mitochondrial density (% vol, 2 - 15) */
   mitoDensity: number;
-  /** MCT1 monocarboxylate transporter density (0 - 1) */
+  /** MCT1 monocarboxylate transporter density (pmol/mg, 50 - 300) */
   mct1Density: number;
-  /** MCT4 monocarboxylate transporter density (0 - 1) */
+  /** MCT4 monocarboxylate transporter density (pmol/mg, 50 - 300) */
   mct4Density: number;
-  /** Intracellular buffering capacity (0 - 1) */
+  /** Intracellular buffering capacity (slykes, 40 - 100) */
   bufferCapacity: number;
-  /** Slow-twitch Type 1 muscle fiber fraction (0 - 1) */
+  /** Slow-twitch Type 1 muscle fiber fraction (%, 10 - 90) */
   fiberType1: number;
-  /** Thermoregulatory cooling efficiency (0 - 1) */
+  /** Thermoregulatory cooling efficiency (W/°C, 10 - 50) */
   coolingEfficiency: number;
-  /** Sweat rate for dehydration dynamics (0 - 1) */
+  /** Sweat rate for dehydration dynamics (L/hr, 0 - 3) */
   sweatRate: number;
-  /** Maximum stroke volume in mL (100 - 150) */
+  /** Maximum stroke volume in mL (80 - 200) */
   svMax: number;
 }
 

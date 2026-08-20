@@ -10,9 +10,10 @@ export const K_MCT4 = 0.08; // Efflux constant
 
 /**
  * Runs a 1-second Euler numerical integration simulation of human cycling physiology.
+ * Normalizes scientific hardware units to mathematical ODE coefficients.
  * Continues plotting planned workout watts after failure (blow up) while setting biological traces to null.
  *
- * @param hardware Physiological characteristics and biological hardware parameters.
+ * @param hardware Physiological characteristics and biological hardware parameters in scientific units.
  * @param workout Array of workout intervals with target watts and duration in seconds.
  * @returns Array of SimulationPoint records across the entire planned workout duration.
  */
@@ -20,12 +21,22 @@ export function runSimulation(
   hardware: Hardware,
   workout: WorkoutBlock[]
 ): SimulationPoint[] {
+  // Normalize biological units to 0.0 - 1.0 mathematical coefficients for the ODEs
+  const normMito = hardware.mitoDensity / 15.0;
+  const normMct1 = hardware.mct1Density / 300.0;
+  const normMct4 = hardware.mct4Density / 300.0;
+  const normBuffer = hardware.bufferCapacity / 100.0;
+  const normFiber1 = hardware.fiberType1 / 100.0;
+  const normCooling = hardware.coolingEfficiency / 50.0;
+  const normSweat = hardware.sweatRate / 3.0;
+  // svMax is used natively in mL, do not normalize it.
+
   // Baseline Math (run once before the loop)
-  const fiberType2 = 1.0 - hardware.fiberType1;
+  const fiberType2 = 1.0 - normFiber1;
   const MLSS =
     150 +
-    300 * hardware.mitoDensity * hardware.fiberType1 * hardware.mct1Density -
-    50 * fiberType2 * hardware.mct4Density;
+    300 * normMito * normFiber1 * normMct1 -
+    50 * fiberType2 * normMct4;
 
   // Initialize state variables
   let pcr1 = 1.0;
@@ -47,7 +58,7 @@ export function runSimulation(
   let currentTime = 0;
 
   // Guard against divide-by-zero if bufferCapacity is 0
-  const bufferCapacityFactor = Math.max(0.001, hardware.bufferCapacity) * 10;
+  const bufferCapacityFactor = Math.max(0.001, normBuffer) * 10;
 
   // Outer loop through workout blocks (completes full workout duration)
   for (const block of workout) {
@@ -101,7 +112,7 @@ export function runSimulation(
 
       // flux_mct4 (lactate export from muscle to blood via MCT4)
       const flux_mct4 =
-        K_MCT4 * hardware.mct4Density * Math.max(0, la_muscle - la_blood);
+        K_MCT4 * normMct4 * Math.max(0, la_muscle - la_blood);
 
       // d_la_muscle derivative
       const d_la_muscle = (v_prod - flux_mct4) / bufferCapacityFactor;
@@ -110,8 +121,8 @@ export function runSimulation(
       const flux_mct1 =
         watts < MLSS
           ? K_OX *
-            hardware.mct1Density *
-            hardware.mitoDensity *
+            normMct1 *
+            normMito *
             la_blood *
             (MLSS - watts)
           : 0.0;
@@ -129,11 +140,11 @@ export function runSimulation(
       const heat_gen = watts * (1 / current_gme - 1);
       const d_temp =
         heat_gen * 0.0001 -
-        hardware.coolingEfficiency * 0.05 * (core_temp - 37.0);
+        normCooling * 0.05 * (core_temp - 37.0);
 
       // Fluid loss & Stroke Volume dynamics (Fick Principle)
       const d_fluid =
-        hardware.sweatRate * 0.001 * Math.max(0, core_temp - 37.0);
+        normSweat * 0.001 * Math.max(0, core_temp - 37.0);
       fluid_loss += d_fluid;
       sv = Math.max(
         40,

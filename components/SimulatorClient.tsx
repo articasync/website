@@ -15,81 +15,88 @@ import {
 } from "recharts";
 import { runSimulation } from "@/lib/physics";
 import { useSimulatorStore } from "@/store/useSimulatorStore";
-import { ChartToggles, Hardware } from "@/types/simulator";
+import { ChartToggles, Hardware, SimulationPoint } from "@/types/simulator";
 
 interface SliderConfig {
   key: keyof Hardware;
   label: string;
   description: string;
-  min?: number;
-  max?: number;
-  step?: number;
-  unit?: string;
+  min: number;
+  max: number;
+  step: number;
+  unit: string;
 }
 
 const HARDWARE_SLIDERS: SliderConfig[] = [
   {
     key: "mitoDensity",
-    label: "Mitochondrial Density",
-    description: "Oxidative phosphorylation & aerobic clearance",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    label: "Mito Density",
+    description: "Mitochondrial volume fraction (oxidative phosphorylation capacity)",
+    min: 2,
+    max: 15,
+    step: 0.5,
+    unit: "% vol",
   },
   {
     key: "mct1Density",
     label: "MCT1 Density",
-    description: "Lactate influx into oxidative fibers & heart",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    description: "Lactate influx into oxidative fibers & cardiac myocytes",
+    min: 50,
+    max: 300,
+    step: 5,
+    unit: "pmol/mg",
   },
   {
     key: "mct4Density",
     label: "MCT4 Density",
-    description: "Lactate efflux from glycolytic muscle to blood",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    description: "Lactate efflux from glycolytic muscle into blood",
+    min: 50,
+    max: 300,
+    step: 5,
+    unit: "pmol/mg",
   },
   {
     key: "bufferCapacity",
-    label: "Buffering Capacity",
-    description: "Intracellular acidosis resistance (pH buffering)",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    label: "Buffer Capacity",
+    description: "Intracellular acidosis resistance (pH buffering in slykes)",
+    min: 40,
+    max: 100,
+    step: 1,
+    unit: "slykes",
   },
   {
     key: "fiberType1",
-    label: "Type 1 Slow-Twitch Fiber",
-    description: "Fatigue-resistant aerobic motor unit fraction",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    label: "Type 1 Fiber",
+    description: "Fatigue-resistant slow-twitch motor unit percentage",
+    min: 10,
+    max: 90,
+    step: 1,
+    unit: "%",
   },
   {
     key: "coolingEfficiency",
-    label: "Cooling Efficiency",
-    description: "Thermoregulation, sweating & heat dissipation",
-    min: 0,
-    max: 1,
-    step: 0.01,
+    label: "Cooling Rate",
+    description: "Thermoregulatory heat dissipation efficiency",
+    min: 10,
+    max: 50,
+    step: 1,
+    unit: "W/°C",
   },
   {
     key: "sweatRate",
     label: "Sweat Rate",
-    description: "Thermoregulatory fluid loss & dehydration kinetics",
+    description: "Fluid loss rate driving dehydration & plasma volume reduction",
     min: 0,
-    max: 1,
-    step: 0.01,
+    max: 3,
+    step: 0.1,
+    unit: "L/hr",
   },
   {
     key: "svMax",
-    label: "Max Stroke Volume (SVmax)",
-    description: "Peak ventricular stroke volume (cardiac capacity)",
-    min: 100,
-    max: 150,
+    label: "Max SV",
+    description: "Peak ventricular stroke volume (cardiac pumping limit)",
+    min: 80,
+    max: 200,
     step: 1,
     unit: "mL",
   },
@@ -107,61 +114,61 @@ const TOGGLE_CONFIGS: ToggleMeta[] = [
     key: "showWatts",
     label: "Watts",
     color: "#9ca3af",
-    activeClass: "bg-gray-600 text-white border-gray-600",
+    activeClass: "bg-gray-700 text-white border-gray-700 shadow-2xs",
   },
   {
     key: "showHR",
     label: "Heart Rate",
     color: "#ef4444",
-    activeClass: "bg-red-500 text-white border-red-500",
+    activeClass: "bg-red-500 text-white border-red-500 shadow-2xs",
   },
   {
     key: "showMuscleH",
     label: "Muscle Lactate",
     color: "#8b5cf6",
-    activeClass: "bg-purple-600 text-white border-purple-600",
+    activeClass: "bg-purple-600 text-white border-purple-600 shadow-2xs",
   },
   {
     key: "showBloodH",
     label: "Blood Lactate",
     color: "#3b82f6",
-    activeClass: "bg-blue-600 text-white border-blue-600",
+    activeClass: "bg-blue-600 text-white border-blue-600 shadow-2xs",
   },
   {
     key: "showPCr1",
     label: "Type 1 PCr",
     color: "#10b981",
-    activeClass: "bg-emerald-600 text-white border-emerald-600",
+    activeClass: "bg-emerald-600 text-white border-emerald-600 shadow-2xs",
   },
   {
     key: "showPCr2",
     label: "Type 2 PCr",
     color: "#f59e0b",
-    activeClass: "bg-amber-500 text-white border-amber-500",
+    activeClass: "bg-amber-500 text-white border-amber-500 shadow-2xs",
   },
   {
     key: "showEpi",
     label: "Epinephrine",
     color: "#f97316",
-    activeClass: "bg-orange-500 text-white border-orange-500",
+    activeClass: "bg-orange-500 text-white border-orange-500 shadow-2xs",
   },
   {
     key: "showGlycogen",
     label: "Glycogen",
     color: "#06b6d4",
-    activeClass: "bg-cyan-600 text-white border-cyan-600",
+    activeClass: "bg-cyan-600 text-white border-cyan-600 shadow-2xs",
   },
   {
     key: "showPi",
     label: "Inorganic Pi",
     color: "#ec4899",
-    activeClass: "bg-pink-600 text-white border-pink-600",
+    activeClass: "bg-pink-600 text-white border-pink-600 shadow-2xs",
   },
   {
     key: "showGutIschemia",
     label: "Gut Ischemia",
     color: "#dc2626",
-    activeClass: "bg-rose-700 text-white border-rose-700",
+    activeClass: "bg-rose-700 text-white border-rose-700 shadow-2xs",
   },
 ];
 
@@ -217,38 +224,78 @@ export default function SimulatorClient() {
     [hardware, workout]
   );
 
+  // Normalized simulation data for unified 0-100 plotting scale
+  const normalizedSimulationData = useMemo(() => {
+    const BOUNDS: Record<string, [number, number]> = {
+      watts: [0, 1000],
+      hr: [40, 200],
+      la_muscle: [1, 20],
+      la_blood: [1, 20],
+      pcr1: [0, 1],
+      pcr2: [0, 1],
+      epi: [0, 1],
+      glycogen: [0, 100],
+      pi: [0, 1.5],
+      gut_ischemia: [0, 100],
+    };
+
+    return simulationData.map((pt) => {
+      const normPt: Record<string, any> = { ...pt };
+      for (const [key, [min, max]] of Object.entries(BOUNDS)) {
+        const rawVal = pt[key as keyof SimulationPoint];
+        if (rawVal !== null && rawVal !== undefined) {
+          const val = Number(rawVal);
+          normPt[`norm_${key}`] = Math.max(
+            0,
+            Math.min(100, ((val - min) / (max - min)) * 100)
+          );
+        } else {
+          normPt[`norm_${key}`] = null;
+        }
+      }
+      return normPt;
+    });
+  }, [simulationData]);
+
   // Check if simulation triggered failure
   const blowupPoint = useMemo(
     () => simulationData.find((p) => p.blown_up),
     [simulationData]
   );
 
+  // Normalize biological units to 0.0 - 1.0 mathematical coefficients for baseline estimates
+  const normMito = hardware.mitoDensity / 15.0;
+  const normMct1 = hardware.mct1Density / 300.0;
+  const normMct4 = hardware.mct4Density / 300.0;
+  const normBuffer = hardware.bufferCapacity / 100.0;
+  const normFiber1 = hardware.fiberType1 / 100.0;
+
   // Dynamic MLSS calculation from physics baseline formula
-  const fiberType2 = 1.0 - hardware.fiberType1;
+  const fiberType2 = 1.0 - normFiber1;
   const calculatedMLSS = Math.round(
     150 +
-      300 * hardware.mitoDensity * hardware.fiberType1 * hardware.mct1Density -
-      50 * fiberType2 * hardware.mct4Density
+      300 * normMito * normFiber1 * normMct1 -
+      50 * fiberType2 * normMct4
   );
   const power1h = calculatedMLSS;
   const power5m = Math.round(
     calculatedMLSS +
-      100 * hardware.mitoDensity * hardware.mct1Density +
+      100 * normMito * normMct1 +
       50 * fiberType2
   );
   const power1m = Math.round(
     calculatedMLSS +
-      250 * hardware.mct4Density * hardware.bufferCapacity * fiberType2
+      250 * normMct4 * normBuffer * fiberType2
   );
   const power5s = Math.round(calculatedMLSS + 800 * fiberType2);
 
   // Power zone shading areas mapped over workout blocks
   const zoneAreas = useMemo(() => {
-    let currentStart = 0;
+    let currentStart = 1; // Simulation loop starts at time = 1
     return workout.map((block, index) => {
       const start = currentStart;
-      const end = currentStart + block.durationSeconds;
-      currentStart = end;
+      const end = currentStart + block.durationSeconds - 1;
+      currentStart = end + 1;
       return {
         id: block.id || `zone-${index}`,
         start,
@@ -338,40 +385,41 @@ export default function SimulatorClient() {
         </div>
       </div>
 
-      {/* Grid Layout: Sidebar (Hardware) + Main (Recharts Graph) + Bottom (Workout Builder) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Sidebar: Hardware Sliders (4 Cols on lg) */}
-        <aside className="lg:col-span-4 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-5">
-          <div className="border-b border-gray-100 pb-3">
-            <h2 className="text-lg font-bold text-gray-900">Physiology Hardware</h2>
-            <p className="text-xs text-gray-500">
-              Adjust biological parameters & hemodynamic limits
-            </p>
+      {/* Grid Layout: Sidebar (Hardware) + Main (Recharts Graph & Toggles) + Bottom (Workout Builder) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Sidebar: Compact Physiology Hardware Sliders (4 Cols on lg) */}
+        <aside className="lg:col-span-4 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2.5">
+          <div className="border-b border-gray-100 pb-2 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">Physiology Hardware</h2>
+              <p className="text-[11px] text-gray-500">Biological constraints & kinetics</p>
+            </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-1.5">
             {HARDWARE_SLIDERS.map(
-              ({
-                key,
-                label,
-                description,
-                min = 0,
-                max = 1,
-                step = 0.01,
-                unit,
-              }) => {
+              ({ key, label, description, min, max, step, unit }) => {
                 const value = hardware[key];
-                const displayVal = unit ? `${value}${unit}` : value.toFixed(2);
+                const displayVal = `${value.toFixed(step < 1 ? 1 : 0)} ${unit}`.trim();
                 return (
                   <div
                     key={key}
-                    className="space-y-1.5 bg-gray-50/70 p-3 rounded-xl border border-gray-100"
+                    className="p-2 bg-gray-50/80 hover:bg-gray-50 rounded-lg border border-gray-100 space-y-1 transition-colors"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-gray-800">
-                        {label}
-                      </span>
-                      <span className="font-mono font-bold text-indigo-600 bg-white px-2 py-0.5 rounded border border-gray-200 shadow-2xs">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="font-semibold text-gray-800 text-[11px] truncate">
+                          {label}
+                        </span>
+                        {/* Native tooltip info icon */}
+                        <span
+                          title={description}
+                          className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-gray-200 hover:bg-indigo-100 text-[9px] font-bold text-gray-500 hover:text-indigo-600 cursor-help flex-shrink-0 transition-colors"
+                        >
+                          i
+                        </span>
+                      </div>
+                      <span className="font-mono font-bold text-[10px] text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-2xs flex-shrink-0">
                         {displayVal}
                       </span>
                     </div>
@@ -384,11 +432,8 @@ export default function SimulatorClient() {
                       onChange={(e) =>
                         setHardware({ [key]: parseFloat(e.target.value) })
                       }
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none"
+                      className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none"
                     />
-                    <p className="text-[11px] text-gray-500 leading-tight">
-                      {description}
-                    </p>
                   </div>
                 );
               }
@@ -396,14 +441,21 @@ export default function SimulatorClient() {
           </div>
         </aside>
 
-        {/* Main Center Area: Live Recharts Graph & Toggles (8 Cols on lg) */}
-        <main className="lg:col-span-8 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
-          {/* Toggles UI: Pill Buttons */}
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-gray-100 pb-3">
-            <div className="text-xs font-bold text-gray-600 uppercase tracking-wider">
-              Chart Traces:
-            </div>
-            <div className="flex flex-wrap gap-1.5">
+        {/* Main Center Area: Left-Aligned Toggles & Normalized Recharts Graph (8 Cols on lg) */}
+        <main className="lg:col-span-8 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+            <h2 className="text-base font-bold text-gray-900">Physiological Dynamics</h2>
+            <span className="text-[11px] text-gray-400">
+              Normalized 0–100% relative plot scale
+            </span>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-4 items-stretch">
+            {/* Left Side: Vertical Toggles Column */}
+            <div className="flex flex-row md:flex-col gap-1.5 w-full md:w-36 flex-wrap md:flex-nowrap flex-shrink-0">
+              <span className="hidden md:block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                Chart Traces
+              </span>
               {TOGGLE_CONFIGS.map(({ key, label, activeClass, color }) => {
                 const isActive = toggles[key];
                 return (
@@ -411,246 +463,242 @@ export default function SimulatorClient() {
                     key={key}
                     type="button"
                     onClick={() => setToggle(key)}
-                    className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all flex items-center gap-1.5 ${
+                    className={`w-full text-left px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all flex items-center justify-between gap-1.5 ${
                       isActive
                         ? activeClass
-                        : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                        : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                     }`}
                   >
+                    <span className="truncate">{label}</span>
                     <span
-                      className="w-2 h-2 rounded-full inline-block"
+                      className="w-2 h-2 rounded-full flex-shrink-0"
                       style={{ backgroundColor: color }}
                     />
-                    {label}
                   </button>
                 );
               })}
             </div>
-          </div>
 
-          {/* Chart View */}
-          <div className="w-full min-h-[400px] flex items-center justify-center">
-            {!isMounted ? (
-              <div className="flex flex-col items-center justify-center h-[400px] text-gray-400 space-y-2">
-                <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs">Loading simulator charts...</span>
-              </div>
-            ) : simulationData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
-                <span className="text-sm">
-                  No simulation data available. Add workout intervals below.
-                </span>
-              </div>
-            ) : (
-              <div className="w-full h-[400px]">
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart
-                    data={simulationData}
-                    margin={{ top: 15, right: 20, left: -20, bottom: 5 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#e5e7eb"
-                    />
-                    <XAxis
-                      dataKey="time"
-                      tick={{ fontSize: 12 }}
-                      stroke="#9ca3af"
-                      label={{
-                        value: "Time (s)",
-                        position: "insideBottomRight",
-                        offset: -5,
-                        fontSize: 10,
-                        fill: "#9ca3af",
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        borderColor: "#e5e7eb",
-                        borderRadius: "0.75rem",
-                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                    />
-                    <YAxis
-                      yAxisId="left"
-                      orientation="left"
-                      tick={{ fontSize: 12 }}
-                      stroke="#6b7280"
-                    />
-                    <YAxis
-                      yAxisId="right"
-                      orientation="right"
-                      tick={{ fontSize: 12 }}
-                      stroke="#6b7280"
-                    />
-
-                    {/* Zone background reference shading */}
-                    {zoneAreas.map((area, index) => (
-                      <ReferenceArea
-                        key={area.id ?? index}
-                        x1={area.start}
-                        x2={area.end}
-                        fill={area.color}
-                        fillOpacity={0.3}
-                      />
-                    ))}
-
-                    {/* Vertical reference line at the exact moment of failure */}
-                    {blowupPoint && (
-                      <ReferenceLine
-                        x={blowupPoint.time}
-                        stroke="red"
-                        strokeWidth={2}
+            {/* Right Side: Recharts Graph */}
+            <div className="flex-1 w-full min-w-0 min-h-[400px] flex items-center justify-center">
+              {!isMounted ? (
+                <div className="flex flex-col items-center justify-center h-[400px] text-gray-400 space-y-2">
+                  <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs">Loading simulator charts...</span>
+                </div>
+              ) : simulationData.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
+                  <span className="text-sm">
+                    No simulation data available. Add workout intervals below.
+                  </span>
+                </div>
+              ) : (
+                <div className="w-full h-[400px]">
+                  <ResponsiveContainer width="100%" height={400}>
+                    <LineChart
+                      data={normalizedSimulationData}
+                      margin={{ top: 15, right: 10, left: 10, bottom: 5 }}
+                    >
+                      <CartesianGrid
                         strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#f0f0f0"
+                      />
+                      <XAxis
+                        dataKey="time"
+                        type="number"
+                        domain={["dataMin", "dataMax"]}
+                        tick={{ fontSize: 11 }}
+                        stroke="#9ca3af"
                         label={{
-                          position: "top",
-                          value: "Failure",
-                          fill: "red",
-                          fontSize: 12,
+                          value: "Time (s)",
+                          position: "insideBottomRight",
+                          offset: -5,
+                          fontSize: 10,
+                          fill: "#9ca3af",
                         }}
                       />
-                    )}
+                      {/* Single hidden YAxis with fixed 0-100 domain */}
+                      <YAxis hide={true} domain={[0, 100]} />
 
-                    {toggles.showWatts && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="watts"
-                        name="Watts"
-                        yAxisId="left"
-                        stroke="#9ca3af"
-                        strokeDasharray="5 5"
-                        dot={false}
-                        strokeWidth={2}
+                      <Tooltip
+                        formatter={(value: any, name: any, props: any) => {
+                          const rawKey = props?.dataKey
+                            ? String(props.dataKey).replace("norm_", "")
+                            : "";
+                          const rawVal = props?.payload ? props.payload[rawKey] : value;
+                          return [
+                            typeof rawVal === "number"
+                              ? rawVal.toFixed(2)
+                              : rawVal,
+                            name ?? "",
+                          ];
+                        }}
+                        contentStyle={{
+                          backgroundColor: "#ffffff",
+                          borderRadius: "0.5rem",
+                          fontSize: "12px",
+                          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                          border: "1px solid #e5e7eb",
+                        }}
                       />
-                    )}
-                    {toggles.showHR && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="hr"
-                        name="Heart Rate (bpm)"
-                        yAxisId="left"
-                        stroke="#ef4444"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
+                      <Legend
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                       />
-                    )}
-                    {toggles.showMuscleH && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="la_muscle"
-                        name="Muscle Lactate (mmol/L)"
-                        yAxisId="right"
-                        stroke="#8b5cf6"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showBloodH && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="la_blood"
-                        name="Blood Lactate (mmol/L)"
-                        yAxisId="right"
-                        stroke="#3b82f6"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showPCr1 && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="pcr1"
-                        name="Type 1 PCr"
-                        yAxisId="right"
-                        stroke="#10b981"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showPCr2 && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="pcr2"
-                        name="Type 2 PCr"
-                        yAxisId="right"
-                        stroke="#f59e0b"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showEpi && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="epi"
-                        name="Epinephrine"
-                        yAxisId="right"
-                        stroke="#f97316"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showGlycogen && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="glycogen"
-                        name="Glycogen (%)"
-                        yAxisId="right"
-                        stroke="#06b6d4"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showPi && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="pi"
-                        name="Inorganic Pi"
-                        yAxisId="right"
-                        stroke="#ec4899"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                    {toggles.showGutIschemia && (
-                      <Line
-                        isAnimationActive={false}
-                        type="monotone"
-                        dataKey="gut_ischemia"
-                        name="Gut Ischemia (%)"
-                        yAxisId="right"
-                        stroke="#dc2626"
-                        dot={false}
-                        strokeWidth={2}
-                        connectNulls={false}
-                      />
-                    )}
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+
+                      {/* Zone background reference shading */}
+                      {zoneAreas.map((area, index) => (
+                        <ReferenceArea
+                          key={area.id ?? index}
+                          x1={area.start}
+                          x2={area.end}
+                          fill={area.color}
+                          fillOpacity={0.4}
+                          strokeOpacity={0}
+                        />
+                      ))}
+
+                      {/* Vertical reference line at the exact moment of failure */}
+                      {blowupPoint && (
+                        <ReferenceLine
+                          x={blowupPoint.time}
+                          stroke="red"
+                          strokeWidth={2}
+                          strokeDasharray="3 3"
+                          label={{
+                            position: "top",
+                            value: "Failure",
+                            fill: "red",
+                            fontSize: 12,
+                          }}
+                        />
+                      )}
+
+                      {toggles.showWatts && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_watts"
+                          name="Watts"
+                          stroke="#9ca3af"
+                          strokeDasharray="5 5"
+                          dot={false}
+                          strokeWidth={2}
+                        />
+                      )}
+                      {toggles.showHR && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_hr"
+                          name="Heart Rate (bpm)"
+                          stroke="#ef4444"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showMuscleH && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_la_muscle"
+                          name="Muscle Lactate (mmol/L)"
+                          stroke="#8b5cf6"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showBloodH && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_la_blood"
+                          name="Blood Lactate (mmol/L)"
+                          stroke="#3b82f6"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showPCr1 && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_pcr1"
+                          name="Type 1 PCr"
+                          stroke="#10b981"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showPCr2 && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_pcr2"
+                          name="Type 2 PCr"
+                          stroke="#f59e0b"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showEpi && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_epi"
+                          name="Epinephrine"
+                          stroke="#f97316"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showGlycogen && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_glycogen"
+                          name="Glycogen (%)"
+                          stroke="#06b6d4"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showPi && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_pi"
+                          name="Inorganic Pi"
+                          stroke="#ec4899"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                      {toggles.showGutIschemia && (
+                        <Line
+                          isAnimationActive={false}
+                          type="monotone"
+                          dataKey="norm_gut_ischemia"
+                          name="Gut Ischemia (%)"
+                          stroke="#dc2626"
+                          dot={false}
+                          strokeWidth={2}
+                          connectNulls={false}
+                        />
+                      )}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
           </div>
         </main>
 

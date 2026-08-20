@@ -30,14 +30,14 @@ export interface SimulatorState {
 }
 
 export const DEFAULT_HARDWARE: Hardware = {
-  mitoDensity: 0.5,
-  mct1Density: 0.5,
-  mct4Density: 0.5,
-  bufferCapacity: 0.5,
-  fiberType1: 0.6,
-  coolingEfficiency: 0.5,
-  sweatRate: 0.5,
-  svMax: 120,
+  mitoDensity: 8.0, // % vol
+  mct1Density: 150.0, // pmol/mg
+  mct4Density: 150.0, // pmol/mg
+  bufferCapacity: 65.0, // slykes
+  fiberType1: 60.0, // %
+  coolingEfficiency: 25.0, // W/°C
+  sweatRate: 1.5, // L/hr
+  svMax: 120, // mL
 };
 
 export const DEFAULT_WORKOUT: WorkoutBlock[] = [
