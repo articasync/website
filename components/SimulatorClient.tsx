@@ -19,7 +19,12 @@ import {
   runSimulation,
 } from "@/lib/physics";
 import { useSimulatorStore } from "@/store/useSimulatorStore";
-import { ChartToggles, Hardware, SimulationPoint } from "@/types/simulator";
+import {
+  ChartToggles,
+  Hardware,
+  SimulationPoint,
+  WorkoutBlock,
+} from "@/types/simulator";
 
 interface SliderConfig {
   key: keyof Hardware;
@@ -115,12 +120,6 @@ interface ToggleMeta {
 
 const TOGGLE_CONFIGS: ToggleMeta[] = [
   {
-    key: "showWatts",
-    label: "Watts",
-    color: "#9ca3af",
-    activeClass: "bg-gray-700 text-white border-gray-700 shadow-2xs",
-  },
-  {
     key: "showHR",
     label: "Heart Rate",
     color: "#ef4444",
@@ -192,6 +191,31 @@ function getZoneColor(watts: number, mlss: number): string {
   return "#e9d5ff"; // Z7 (150%+): purple
 }
 
+/**
+ * Unrolls complex workout blocks (repeats, secondary intervals) into a flat sequential array.
+ */
+function unrollWorkout(
+  workout: WorkoutBlock[]
+): { watts: number; durationSeconds: number }[] {
+  const flatWorkout: { watts: number; durationSeconds: number }[] = [];
+  for (const block of workout) {
+    const repeats = block.repeats && block.repeats > 0 ? block.repeats : 1;
+    for (let i = 0; i < repeats; i++) {
+      flatWorkout.push({
+        watts: block.watts,
+        durationSeconds: block.durationSeconds,
+      });
+      if (block.watts2 !== undefined && block.durationSeconds2 !== undefined) {
+        flatWorkout.push({
+          watts: block.watts2,
+          durationSeconds: block.durationSeconds2,
+        });
+      }
+    }
+  }
+  return flatWorkout;
+}
+
 export default function SimulatorClient() {
   const {
     hardware,
@@ -214,18 +238,11 @@ export default function SimulatorClient() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-  // Local state for "Add Intervals" generator
-  const [showIntervalsForm, setShowIntervalsForm] = useState(false);
-  const [intervalPower1, setIntervalPower1] = useState(400);
-  const [intervalDuration1, setIntervalDuration1] = useState(60);
-  const [intervalPower2, setIntervalPower2] = useState(200);
-  const [intervalDuration2, setIntervalDuration2] = useState(60);
-  const [intervalRepeats, setIntervalRepeats] = useState(5);
-
-  // Physics execution recalculates instantly when inputs change
+  // Unrolled workout array for physics simulation and zone rendering
+  const flatWorkout = useMemo(() => unrollWorkout(workout), [workout]);
   const simulationData = useMemo(
-    () => runSimulation(hardware, workout),
-    [hardware, workout]
+    () => runSimulation(hardware, flatWorkout as any),
+    [hardware, flatWorkout]
   );
 
   // Normalized simulation data for unified 0-100 plotting scale
@@ -279,60 +296,34 @@ export default function SimulatorClient() {
     };
   }, [hardware]);
 
-  // Power zone shading areas mapped over workout blocks
+  // Power zone shading areas mapped over unrolled flatWorkout
   const zoneAreas = useMemo(() => {
-    let currentStart = 1; // Simulation loop starts at time = 1
-    return workout.map((block, index) => {
+    let currentStart = 1;
+    return flatWorkout.map((block, index) => {
       const start = currentStart;
       const end = currentStart + block.durationSeconds - 1;
       currentStart = end + 1;
       return {
-        id: block.id || `zone-${index}`,
+        id: `zone-${index}`,
         start,
         end,
         color: getZoneColor(block.watts, mlss),
       };
     });
-  }, [workout, mlss]);
-
-  // Handler to generate repeated interval blocks
-  const handleGenerateIntervals = () => {
-    const repeats = Math.max(1, Math.min(50, intervalRepeats || 1));
-    const p1 = Math.max(0, intervalPower1 || 0);
-    const d1 = Math.max(1, intervalDuration1 || 1);
-    const p2 = Math.max(0, intervalPower2 || 0);
-    const d2 = Math.max(1, intervalDuration2 || 1);
-
-    for (let i = 0; i < repeats; i++) {
-      addWorkoutBlock({ watts: p1, durationSeconds: d1 });
-      addWorkoutBlock({ watts: p2, durationSeconds: d2 });
-    }
-  };
+  }, [flatWorkout, mlss]);
 
   return (
     <div className="w-full space-y-6">
-      {/* Page Header with 5 Power & Metabolic Stat Cards */}
+      {/* Clean Page Header with Horizontally Aligned 5 Stat Cards */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
             Cycling Simulator
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Dynamic computational model of bioenergetics, hemodynamics, acid-base balance, and fatigue kinetics.
-          </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap sm:justify-end">
-          {blowupPoint && (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-1.5 text-right">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-red-600 block">
-                Status
-              </span>
-              <div className="text-xs font-bold text-red-800">
-                Blown Up @ {blowupPoint.time}s
-              </div>
-            </div>
-          )}
 
+        {/* 5 Stats Cards in a clean, uniform horizontal row */}
+        <div className="flex flex-row items-center gap-2 flex-wrap sm:justify-end">
           {/* 1. 5s Power */}
           <div className="bg-amber-50/80 border border-amber-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
             <span className="text-[10px] uppercase font-bold tracking-wider text-amber-700 block">
@@ -363,8 +354,8 @@ export default function SimulatorClient() {
             </div>
           </div>
 
-          {/* 4. 1h Power (FTP - Exhaustion Limit) */}
-          <div className="bg-blue-50/90 border border-blue-200 rounded-xl px-3 py-1.5 text-center min-w-[78px]">
+          {/* 4. 1h Power (FTP) */}
+          <div className="bg-blue-50/90 border border-blue-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
             <span className="text-[10px] uppercase font-bold tracking-wider text-blue-700 block">
               1h (FTP)
             </span>
@@ -373,25 +364,14 @@ export default function SimulatorClient() {
             </div>
           </div>
 
-          {/* 5. Calculated MLSS (Metabolic Equilibrium Point - Distinct Emphasis) */}
-          <div className="bg-indigo-50 border-2 border-indigo-400/80 rounded-xl px-3.5 py-1.5 text-center min-w-[86px] shadow-xs ring-1 ring-indigo-200/60">
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-[10px] uppercase font-black tracking-wider text-indigo-700 block">
-                MLSS
-              </span>
-              <span
-                title="Maximal Lactate Steady State: The highest steady power where metabolic lactate production equals systemic clearance."
-                className="inline-flex items-center justify-center w-3 h-3 rounded-full bg-indigo-200/80 text-[8px] font-bold text-indigo-700 cursor-help"
-              >
-                i
-              </span>
-            </div>
-            <div className="text-lg font-black text-indigo-950 leading-tight">
-              {mlss} <span className="text-xs font-bold text-indigo-700">W</span>
-            </div>
-            <span className="text-[9px] font-medium text-indigo-600/80 block">
-              Equilibrium
+          {/* 5. Calculated MLSS */}
+          <div className="bg-indigo-50/90 border border-indigo-200 rounded-xl px-3 py-1.5 text-center min-w-[70px]">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-700 block">
+              MLSS
             </span>
+            <div className="text-base font-bold text-indigo-950">
+              {mlss} <span className="text-xs font-semibold text-indigo-700">W</span>
+            </div>
           </div>
         </div>
       </div>
@@ -585,18 +565,18 @@ export default function SimulatorClient() {
                         />
                       )}
 
-                      {toggles.showWatts && (
-                        <Line
-                          isAnimationActive={false}
-                          type="monotone"
-                          dataKey="norm_watts"
-                          name="Watts"
-                          stroke="#9ca3af"
-                          strokeDasharray="5 5"
-                          dot={false}
-                          strokeWidth={2}
-                        />
-                      )}
+                      {/* Watts always rendered unconditionally */}
+                      <Line
+                        isAnimationActive={false}
+                        type="monotone"
+                        dataKey="norm_watts"
+                        name="Watts"
+                        stroke="#9ca3af"
+                        strokeDasharray="5 5"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+
                       {toggles.showHR && (
                         <Line
                           isAnimationActive={false}
@@ -713,178 +693,44 @@ export default function SimulatorClient() {
           </div>
         </main>
 
-        {/* Bottom Pane: Workout Builder (Full 12 Cols) */}
+        {/* Bottom Pane: Redesigned Native Interval Workout Builder (Full 12 Cols) */}
         <section className="lg:col-span-12 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-gray-100 pb-3">
             <div>
               <h2 className="text-lg font-bold text-gray-900">
-                Workout Intervals
+                Workout Builder
               </h2>
               <p className="text-xs text-gray-500">
-                Drag blocks to reorder • Define power profiles and interval durations
+                Drag blocks to reorder • Configure target efforts and optional interval loops
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setShowIntervalsForm(!showIntervalsForm)}
-                className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all ${
-                  showIntervalsForm
-                    ? "bg-indigo-50 border-indigo-300 text-indigo-700 shadow-xs"
-                    : "bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
-                }`}
+            <button
+              type="button"
+              onClick={() =>
+                addWorkoutBlock({ watts: 200, durationSeconds: 60 })
+              }
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h7"
-                  />
-                </svg>
-                {showIntervalsForm ? "Hide Interval Generator" : "Add Intervals"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  addWorkoutBlock({ watts: 200, durationSeconds: 60 })
-                }
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Add Block
-              </button>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Block
+            </button>
           </div>
-
-          {/* Expandable "Add Intervals" Generator Form */}
-          {showIntervalsForm && (
-            <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-900">
-                  Interval Set Generator
-                </span>
-                <span className="text-[11px] text-indigo-700">
-                  Generates {intervalRepeats * 2} alternating work/recovery blocks
-                </span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 items-end">
-                <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                    Power 1 (W)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="2000"
-                    step="5"
-                    value={intervalPower1}
-                    onChange={(e) => setIntervalPower1(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                    Duration 1 (s)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="36000"
-                    step="5"
-                    value={intervalDuration1}
-                    onChange={(e) => setIntervalDuration1(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                    Power 2 (W)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="2000"
-                    step="5"
-                    value={intervalPower2}
-                    onChange={(e) => setIntervalPower2(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                    Duration 2 (s)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="36000"
-                    step="5"
-                    value={intervalDuration2}
-                    onChange={(e) => setIntervalDuration2(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-
-                <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
-                    Repeats
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="50"
-                    step="1"
-                    value={intervalRepeats}
-                    onChange={(e) => setIntervalRepeats(Number(e.target.value))}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowIntervalsForm(false)}
-                  className="px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-600 text-xs font-medium rounded-lg border border-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGenerateIntervals}
-                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
-                >
-                  Generate Intervals
-                </button>
-              </div>
-            </div>
-          )}
 
           {workout.length === 0 ? (
             <div className="text-center py-8 text-sm text-gray-400">
-              No workout intervals defined. Click "Add Block" or "Add Intervals" to start.
+              No workout intervals defined. Click "Add Block" to start building your workout.
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -913,7 +759,7 @@ export default function SimulatorClient() {
                     setDraggedIndex(null);
                     setDragOverIndex(null);
                   }}
-                  className={`bg-gray-50 border border-gray-200 rounded-xl p-3.5 space-y-3 relative group cursor-move transition-all ${
+                  className={`bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex flex-col space-y-2 relative group cursor-move transition-all ${
                     draggedIndex === index ? "opacity-50" : ""
                   } ${
                     dragOverIndex === index
@@ -921,7 +767,8 @@ export default function SimulatorClient() {
                       : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  {/* Block Header */}
+                  <div className="flex items-center justify-between pb-1">
                     <div className="flex items-center gap-1.5">
                       {/* 6-dot grip indicator */}
                       <svg
@@ -949,9 +796,10 @@ export default function SimulatorClient() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Main Work Effort Inputs (1 Column Stacked) */}
+                  <div className="space-y-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-gray-500 mb-1">
+                      <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                         Power (Watts)
                       </label>
                       <input
@@ -970,7 +818,7 @@ export default function SimulatorClient() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-medium text-gray-500 mb-1">
+                      <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                         Duration (s)
                       </label>
                       <input
@@ -988,6 +836,84 @@ export default function SimulatorClient() {
                           })
                         }
                         className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Shaded Interval / Recovery / Repeats Section */}
+                  <div className="bg-indigo-50/50 border border-indigo-100 rounded-lg p-2.5 space-y-2 mt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800">
+                        Interval / Recovery (Optional)
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                        Recovery Power (W)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="2000"
+                        step="5"
+                        placeholder="e.g. 150"
+                        value={block.watts2 ?? ""}
+                        onChange={(e) =>
+                          updateWorkoutBlock(block.id, {
+                            watts2:
+                              e.target.value === ""
+                                ? undefined
+                                : Math.max(0, Number(e.target.value)),
+                          })
+                        }
+                        className="w-full bg-white border border-gray-300 rounded-md px-2 py-1 text-xs font-medium text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                        Recovery Duration (s)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="36000"
+                        step="5"
+                        placeholder="e.g. 60"
+                        value={block.durationSeconds2 ?? ""}
+                        onChange={(e) =>
+                          updateWorkoutBlock(block.id, {
+                            durationSeconds2:
+                              e.target.value === ""
+                                ? undefined
+                                : Math.max(1, Number(e.target.value)),
+                          })
+                        }
+                        className="w-full bg-white border border-gray-300 rounded-md px-2 py-1 text-xs font-medium text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                        Repeats
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        step="1"
+                        placeholder="e.g. 5"
+                        value={block.repeats ?? ""}
+                        onChange={(e) =>
+                          updateWorkoutBlock(block.id, {
+                            repeats:
+                              e.target.value === ""
+                                ? undefined
+                                : Math.max(1, Number(e.target.value)),
+                          })
+                        }
+                        className="w-full bg-white border border-gray-300 rounded-md px-2 py-1 text-xs font-medium text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                       />
                     </div>
                   </div>

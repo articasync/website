@@ -2,6 +2,9 @@ export interface WorkoutBlock {
   id: string;
   watts: number;
   durationSeconds: number;
+  watts2?: number;
+  durationSeconds2?: number;
+  repeats?: number;
 }
 
 export interface Hardware {
@@ -30,7 +33,6 @@ export interface ChartToggles {
   showPCr1: boolean;
   showPCr2: boolean;
   showEpi: boolean;
-  showWatts: boolean;
   showGlycogen: boolean;
   showPi: boolean;
   showGutIschemia: boolean;
