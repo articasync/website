@@ -693,7 +693,7 @@ export default function SimulatorClient() {
           </div>
         </main>
 
-        {/* Bottom Pane: Redesigned Native Interval Workout Builder (Full 12 Cols) */}
+        {/* Bottom Pane: Redesigned Horizontal Rows Workout Builder (Full 12 Cols) */}
         <section className="lg:col-span-12 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-gray-100 pb-3">
             <div>
@@ -733,7 +733,7 @@ export default function SimulatorClient() {
               No workout intervals defined. Click "Add Block" to start building your workout.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="flex flex-col gap-3">
               {workout.map((block, index) => (
                 <div
                   key={block.id}
@@ -759,48 +759,38 @@ export default function SimulatorClient() {
                     setDraggedIndex(null);
                     setDragOverIndex(null);
                   }}
-                  className={`bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex flex-col space-y-2 relative group cursor-move transition-all ${
+                  className={`bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col md:flex-row md:items-center gap-3 relative group cursor-move transition-all ${
                     draggedIndex === index ? "opacity-50" : ""
                   } ${
                     dragOverIndex === index
-                      ? "scale-105 border-indigo-500 ring-2 ring-indigo-200 shadow-md"
+                      ? "scale-[1.01] border-indigo-500 ring-2 ring-indigo-200 shadow-md"
                       : ""
                   }`}
                 >
-                  {/* Block Header */}
-                  <div className="flex items-center justify-between pb-1">
-                    <div className="flex items-center gap-1.5">
-                      {/* 6-dot grip indicator */}
-                      <svg
-                        className="w-3.5 h-3.5 text-gray-400 group-hover:text-indigo-600 transition-colors"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                      >
-                        <circle cx="5" cy="4" r="1.5" />
-                        <circle cx="11" cy="4" r="1.5" />
-                        <circle cx="5" cy="8" r="1.5" />
-                        <circle cx="11" cy="8" r="1.5" />
-                        <circle cx="5" cy="12" r="1.5" />
-                        <circle cx="11" cy="12" r="1.5" />
-                      </svg>
-                      <span className="text-xs font-bold text-gray-700 bg-white border border-gray-200 px-2 py-0.5 rounded-md">
-                        Block #{index + 1}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => removeWorkoutBlock(block.id)}
-                      className="text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
-                      title="Remove block"
+                  {/* Left Controls: Grip & Block ID */}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <svg
+                      className="w-3.5 h-3.5 text-gray-400 group-hover:text-indigo-600 transition-colors"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
                     >
-                      Remove
-                    </button>
+                      <circle cx="5" cy="4" r="1.5" />
+                      <circle cx="11" cy="4" r="1.5" />
+                      <circle cx="5" cy="8" r="1.5" />
+                      <circle cx="11" cy="8" r="1.5" />
+                      <circle cx="5" cy="12" r="1.5" />
+                      <circle cx="11" cy="12" r="1.5" />
+                    </svg>
+                    <span className="text-xs font-bold text-gray-700 bg-white border border-gray-200 px-2 py-1 rounded-md min-w-[76px] text-center shadow-2xs">
+                      Block #{index + 1}
+                    </span>
                   </div>
 
-                  {/* Main Work Effort Inputs (1 Column Stacked) */}
-                  <div className="space-y-2">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                        Power (Watts)
+                  {/* Main Effort Inputs: Power (W) and Duration (s) side-by-side */}
+                  <div className="flex items-center gap-2.5 flex-shrink-0">
+                    <div className="w-28">
+                      <label className="block text-[11px] font-semibold text-gray-600 mb-0.5">
+                        Power (W)
                       </label>
                       <input
                         type="number"
@@ -817,8 +807,8 @@ export default function SimulatorClient() {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                    <div className="w-28">
+                      <label className="block text-[11px] font-semibold text-gray-600 mb-0.5">
                         Duration (s)
                       </label>
                       <input
@@ -840,16 +830,10 @@ export default function SimulatorClient() {
                     </div>
                   </div>
 
-                  {/* Shaded Interval / Recovery / Repeats Section */}
-                  <div className="bg-indigo-50/50 border border-indigo-100 rounded-lg p-2.5 space-y-2 mt-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800">
-                        Interval / Recovery (Optional)
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                  {/* Interval Subsection: Shaded box with Recovery Power, Recovery Duration, Repeats */}
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-indigo-50/50 border border-indigo-100 rounded-lg p-2 flex-1 min-w-0">
+                    <div className="flex-1 min-w-[100px]">
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5 truncate">
                         Recovery Power (W)
                       </label>
                       <input
@@ -857,7 +841,7 @@ export default function SimulatorClient() {
                         min="0"
                         max="2000"
                         step="5"
-                        placeholder="e.g. 150"
+                        placeholder="Optional"
                         value={block.watts2 ?? ""}
                         onChange={(e) =>
                           updateWorkoutBlock(block.id, {
@@ -871,8 +855,8 @@ export default function SimulatorClient() {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                    <div className="flex-1 min-w-[100px]">
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5 truncate">
                         Recovery Duration (s)
                       </label>
                       <input
@@ -880,7 +864,7 @@ export default function SimulatorClient() {
                         min="1"
                         max="36000"
                         step="5"
-                        placeholder="e.g. 60"
+                        placeholder="Optional"
                         value={block.durationSeconds2 ?? ""}
                         onChange={(e) =>
                           updateWorkoutBlock(block.id, {
@@ -894,8 +878,8 @@ export default function SimulatorClient() {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5">
+                    <div className="w-20 min-w-[70px]">
+                      <label className="block text-[10px] font-medium text-gray-600 mb-0.5 truncate">
                         Repeats
                       </label>
                       <input
@@ -903,7 +887,7 @@ export default function SimulatorClient() {
                         min="1"
                         max="50"
                         step="1"
-                        placeholder="e.g. 5"
+                        placeholder="1"
                         value={block.repeats ?? ""}
                         onChange={(e) =>
                           updateWorkoutBlock(block.id, {
@@ -917,6 +901,15 @@ export default function SimulatorClient() {
                       />
                     </div>
                   </div>
+
+                  {/* Right Controls: Remove Button */}
+                  <button
+                    onClick={() => removeWorkoutBlock(block.id)}
+                    className="text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-lg border border-transparent hover:border-red-200 transition-colors flex-shrink-0 self-end md:self-center"
+                    title="Remove block"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>
