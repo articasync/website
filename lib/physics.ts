@@ -4,7 +4,7 @@ export const HR_REST = 50;
 export const HR_MAX = 195;
 export const GME = 0.22;
 
-export const K_GLYC = 0.004; // Glycolytic rate constant
+export const K_GLYC = 0.015; // Adjusted for a flatter polynomial curve
 export const K_OX = 0.003; // Oxidative clearance rate constant
 export const K_MCT4 = 0.08; // Efflux constant
 
@@ -58,7 +58,7 @@ function canSustainPower(
     // dpcr1 derivative
     let dpcr1: number;
     if (watts > MLSS) {
-      dpcr1 = -0.01 * (watts - MLSS);
+      dpcr1 = -0.001 * (watts - MLSS);
     } else {
       dpcr1 = 0.005 * (MLSS - watts) * (1 - pcr1);
     }
@@ -66,14 +66,16 @@ function canSustainPower(
     // dpcr2 derivative
     let dpcr2: number;
     if (watts > MLSS * 1.2) {
-      dpcr2 = -0.015 * (watts - MLSS * 1.2);
+      dpcr2 = -0.0002 * (watts - MLSS * 1.2);
     } else {
       dpcr2 = 0.002 * Math.max(0, MLSS - watts) * (1 - pcr2);
     }
 
-    // v_prod
+    // v_prod (Flattened exponent)
     const v_prod =
-      watts > MLSS ? K_GLYC * Math.pow(watts - MLSS, 1.6) * fiberType2 : 0.0;
+      watts > MLSS
+        ? K_GLYC * Math.pow(watts - MLSS, 1.2) * fiberType2
+        : 0.0;
 
     // flux_mct4
     const flux_mct4 = K_MCT4 * normMct4 * Math.max(0, la_muscle - la_blood);
@@ -114,17 +116,24 @@ function canSustainPower(
     const d_epi =
       la_blood > 4.0 ? 0.01 * (la_blood - 4.0) : -0.05 * epi;
 
-    // Heart Rate
-    const o2_demand = watts / current_gme;
-    const raw_target_hr = (o2_demand / sv) * 50 + 10 * epi;
-    const target_hr = Math.min(HR_MAX, Math.max(HR_REST, raw_target_hr));
+    // Target HR based on normalized Stroke Volume demand + Heat + Adrenaline
+    const target_hr = Math.min(
+      HR_MAX,
+      Math.max(
+        HR_REST,
+        HR_REST +
+          (watts / sv) * 45 +
+          Math.max(0, core_temp - 37.0) * 5 +
+          15 * epi
+      )
+    );
     const d_hr = (target_hr - hr) / 40.0;
 
-    // Pi and Glycogen
+    // Pi and Glycogen (Slowed down basal depletion)
     pi = 1.0 - pcr1 + (1.0 - pcr2);
     const d_glycogen =
-      -0.0001 * watts -
-      (watts > MLSS ? 0.001 * Math.pow(watts - MLSS, 1.5) : 0);
+      -0.00001 * watts -
+      (watts > MLSS ? 0.0001 * Math.pow(watts - MLSS, 1.2) : 0);
     glycogen = Math.max(0, glycogen + d_glycogen);
 
     // Gut ischemia
@@ -263,26 +272,26 @@ export function runSimulation(
         continue;
       }
 
-      // dpcr1 derivative
+      // dpcr1 derivative (calibrated for sprint sustainability)
       let dpcr1: number;
       if (watts > MLSS) {
-        dpcr1 = -0.01 * (watts - MLSS);
+        dpcr1 = -0.001 * (watts - MLSS);
       } else {
         dpcr1 = 0.005 * (MLSS - watts) * (1 - pcr1);
       }
 
-      // dpcr2 derivative
+      // dpcr2 derivative (calibrated for sprint sustainability)
       let dpcr2: number;
       if (watts > MLSS * 1.2) {
-        dpcr2 = -0.015 * (watts - MLSS * 1.2);
+        dpcr2 = -0.0002 * (watts - MLSS * 1.2);
       } else {
         dpcr2 = 0.002 * Math.max(0, MLSS - watts) * (1 - pcr2);
       }
 
-      // v_prod (glycolytic lactate production rate)
+      // v_prod (Flattened exponent to 1.2)
       const v_prod =
         watts > MLSS
-          ? K_GLYC * Math.pow(watts - MLSS, 1.6) * fiberType2
+          ? K_GLYC * Math.pow(watts - MLSS, 1.2) * fiberType2
           : 0.0;
 
       // flux_mct4 (lactate export from muscle to blood via MCT4)
@@ -331,17 +340,24 @@ export function runSimulation(
       const d_epi =
         la_blood > 4.0 ? 0.01 * (la_blood - 4.0) : -0.05 * epi;
 
-      // Heart Rate via Fick Principle & Sympathetic Tone
-      const o2_demand = watts / current_gme;
-      const raw_target_hr = (o2_demand / sv) * 50 + 10 * epi;
-      const target_hr = Math.min(HR_MAX, Math.max(HR_REST, raw_target_hr));
+      // Target HR based on normalized Stroke Volume demand + Heat + Adrenaline
+      const target_hr = Math.min(
+        HR_MAX,
+        Math.max(
+          HR_REST,
+          HR_REST +
+            (watts / sv) * 45 +
+            Math.max(0, core_temp - 37.0) * 5 +
+            15 * epi
+        )
+      );
       const d_hr = (target_hr - hr) / 40.0;
 
-      // Inorganic Phosphate (Pi) and Glycogen depletion
+      // Inorganic Phosphate (Pi) and Glycogen (Slowed down basal depletion)
       pi = 1.0 - pcr1 + (1.0 - pcr2);
       const d_glycogen =
-        -0.0001 * watts -
-        (watts > MLSS ? 0.001 * Math.pow(watts - MLSS, 1.5) : 0);
+        -0.00001 * watts -
+        (watts > MLSS ? 0.0001 * Math.pow(watts - MLSS, 1.2) : 0);
       glycogen = Math.max(0, glycogen + d_glycogen);
 
       // Gut Ischemia (splanchnic hypoperfusion from vasoconstriction & hyperthermia)

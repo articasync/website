@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ReferenceArea,
@@ -181,14 +180,12 @@ const TOGGLE_CONFIGS: ToggleMeta[] = [
 function getZoneColor(watts: number, mlss: number): string {
   if (mlss <= 0) return "#f3f4f6";
   const ratio = watts / mlss;
-
   if (ratio < 0.6) return "#f3f4f6"; // Z1 (0-60% MLSS): gray
   if (ratio < 0.75) return "#dbeafe"; // Z2 (60-75%): blue
   if (ratio < 0.9) return "#dcfce7"; // Z3 (75-90%): green
   if (ratio < 1.05) return "#fef08a"; // Z4 (90-105%): yellow
   if (ratio < 1.2) return "#fed7aa"; // Z5 (105-120%): orange
-  if (ratio < 1.5) return "#fecaca"; // Z6 (120-150%): red
-  return "#e9d5ff"; // Z7 (150%+): purple
+  return "#fecaca"; // Z6+ (120%+ MLSS): red
 }
 
 /**
@@ -510,10 +507,21 @@ export default function SimulatorClient() {
                           fill: "#9ca3af",
                         }}
                       />
-                      {/* Left YAxis scaled 0-1000 for target wattage reference area stepped heights */}
-                      <YAxis yAxisId="left" hide={true} domain={[0, 1000]} />
-                      {/* Default YAxis with fixed 0-100 domain for normalized traces */}
-                      <YAxis hide={true} domain={[0, 100]} />
+                      {/* Left Axis: Visible, scales to Watts */}
+                      <YAxis
+                        yAxisId="left"
+                        orientation="left"
+                        tick={{ fontSize: 12 }}
+                        stroke="#9ca3af"
+                        domain={[0, "dataMax + 100"]}
+                      />
+                      {/* Right Axis: Hidden, fixed 0-100 scale for normalized biological traces */}
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        hide={true}
+                        domain={[0, 100]}
+                      />
 
                       <Tooltip
                         formatter={(value: any, name: any, props: any) => {
@@ -535,9 +543,6 @@ export default function SimulatorClient() {
                           boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                           border: "1px solid #e5e7eb",
                         }}
-                      />
-                      <Legend
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                       />
 
                       {/* Stepped power zone background reference shading */}
@@ -571,12 +576,13 @@ export default function SimulatorClient() {
                         />
                       )}
 
-                      {/* Watts always rendered unconditionally */}
+                      {/* Watts always rendered unconditionally on left axis */}
                       <Line
                         isAnimationActive={false}
                         type="monotone"
-                        dataKey="norm_watts"
+                        dataKey="watts"
                         name="Watts"
+                        yAxisId="left"
                         stroke="#9ca3af"
                         strokeDasharray="5 5"
                         dot={false}
@@ -589,6 +595,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_hr"
                           name="Heart Rate (bpm)"
+                          yAxisId="right"
                           stroke="#ef4444"
                           dot={false}
                           strokeWidth={2}
@@ -601,6 +608,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_la_muscle"
                           name="Muscle Lactate (mmol/L)"
+                          yAxisId="right"
                           stroke="#8b5cf6"
                           dot={false}
                           strokeWidth={2}
@@ -613,6 +621,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_la_blood"
                           name="Blood Lactate (mmol/L)"
+                          yAxisId="right"
                           stroke="#3b82f6"
                           dot={false}
                           strokeWidth={2}
@@ -625,6 +634,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_pcr1"
                           name="Type 1 PCr"
+                          yAxisId="right"
                           stroke="#10b981"
                           dot={false}
                           strokeWidth={2}
@@ -637,6 +647,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_pcr2"
                           name="Type 2 PCr"
+                          yAxisId="right"
                           stroke="#f59e0b"
                           dot={false}
                           strokeWidth={2}
@@ -649,6 +660,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_epi"
                           name="Epinephrine"
+                          yAxisId="right"
                           stroke="#f97316"
                           dot={false}
                           strokeWidth={2}
@@ -661,6 +673,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_glycogen"
                           name="Glycogen (%)"
+                          yAxisId="right"
                           stroke="#06b6d4"
                           dot={false}
                           strokeWidth={2}
@@ -673,6 +686,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_pi"
                           name="Inorganic Pi"
+                          yAxisId="right"
                           stroke="#ec4899"
                           dot={false}
                           strokeWidth={2}
@@ -685,6 +699,7 @@ export default function SimulatorClient() {
                           type="monotone"
                           dataKey="norm_gut_ischemia"
                           name="Gut Ischemia (%)"
+                          yAxisId="right"
                           stroke="#dc2626"
                           dot={false}
                           strokeWidth={2}
